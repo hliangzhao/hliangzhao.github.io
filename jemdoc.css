@@ -10,7 +10,7 @@ body {
 	background: hsl(0, 0%, 100%);
 	font-family: "Open Sans";
 	padding-bottom: 8px;
-	font-size:86%;
+	font-size:84%;
 }
 
 #layout-menu {
@@ -130,19 +130,23 @@ h1, h2, h3 {
 }
 
 h1 {
+	font-family: 'Raleway';
 	font-size: 140%;
 }
 
 h2 {
+	font-family: 'Raleway';
 	padding-top: 0.8em;
 	font-size: 120%;
 }
 
 h2 + h3 {
+	font-family: 'Raleway';
     padding-top: 0.2em;
 }
 
 h3 {
+	font-family: 'Raleway';
 	font-size: 120%;
 	border-bottom: none;
 }
@@ -160,6 +164,7 @@ pre {
 }
 
 div#footer {
+	font-family: 'Raleway';
 	font-size: small;
 	border-top: 1px solid #c0c0c0;
 	padding-top: 0.1em;
@@ -348,7 +353,8 @@ td {
     padding-left: 0.0em;
     padding-right: 0.0em;
     text-align: left;
-    border: 1px solid gray;
+	border: 1px solid gray;
+	font-family: 'Raleway';
 }
 
 table + table {
