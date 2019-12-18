@@ -8,7 +8,7 @@ table#tlayout {
 
 body {
 	background: hsl(0, 0%, 100%);
-	font-family: "Open Sans";
+	font-family: 'Ubuntu', sans-serif;
 	padding-bottom: 8px;
 	font-size:84%;
 }
@@ -354,7 +354,6 @@ td {
     padding-right: 0.0em;
     text-align: left;
 	border: 1px solid gray;
-	font-family: 'Raleway';
 }
 
 table + table {
