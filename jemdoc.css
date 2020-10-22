@@ -1,5 +1,3 @@
-/* Default css file for jemdoc. */
-
 table#tlayout {
     border: none;
     border-collapse: separate;
@@ -12,6 +10,92 @@ body {
 	padding-bottom: 8px;
 	font-size:84%;
 }
+
+div#OuterCanvas{
+	width:100%;
+	cursor:default}
+	div#InnerCanvas{
+		margin:0 12px;
+		text-align:center}
+		div#Page{
+			display:inline-block;
+			text-align:left;
+			width:1040px;
+			min-height:400px;
+			margin:30px auto 50px auto;
+			border:1px solid #ccc;
+			border-top-right-radius:50px;
+			border-bottom-left-radius:25px;
+			box-shadow:0 0 24px #bbb;
+			background:rgb(255, 255, 255)}
+			div#Float{
+				position:fixed;
+				visibility:hidden;
+				width:1000px;
+				top:0;
+				left:0;
+				border-left:1px solid #ccc;
+				border-right:1px solid #ccc;
+				box-shadow:0 6px 24px #999}
+				div.title{
+					padding:20px 15px 12px 50px;
+					border-bottom:1px solid #ddd;
+					border-top-right-radius:79px;
+					background:#fff
+				}div.title span.name{
+					display:inline-block;
+					margin:5px 10px 5px 30px;
+					color:#111;
+					font-family:Satyr10,Georgia,serif;
+					font-size:28pt;
+					letter-spacing:1px;
+					word-spacing:2px
+				}div.content{padding:20px 40px 0 40px}
+				span.email i{
+					display:inline-block;
+					overflow:hidden;
+					width:0
+				}div.aboutSection{
+					padding-bottom:30px;
+					min-height:200px
+				}div.aboutSection td.leftPanel{
+					width:600px;
+					padding:20px 50px 00px 20px;
+					vertical-align:top;
+					color:#666;
+					font-family:Ashbury;
+					font-size:11pt;
+					line-height:1.6em
+				}div.aboutSection td.rightPanel{
+					width:225px;
+					padding:20px 0 10px 25px;
+					vertical-align:top;
+					color:#666;
+					font-family:Ashbury;
+					font-size:10pt;
+					line-height:15px
+				}div.aboutSection td.leftPanel p{
+					margin-bottom:20px
+				}div.aboutSection td.leftPanel span.select{
+					color:#933;font-weight:bold;cursor:pointer
+				}div.aboutSection td.leftPanel span.select-wrapper{
+					margin:0 1px 0 1px
+				}div.aboutSection td.rightPanel span.title{
+					display:block;margin:25px 0 5px 0;color:#000;font-family:Satyr10;font-size:13pt
+				}div.aboutSection td.rightPanel span.title:first-child{
+					margin-top:0
+				}div.aboutSection td.rightPanel span.info{
+					display:block;margin:0 0 0px 0
+				}div.aboutSection td.rightPanel i{
+					display:inline-block;width:16px;margin:0 2px 0 0;color:#999;text-align:center
+				}div.aboutSection td.leftPanel a{
+					color:#666;font-weight:bold;text-decoration:none
+				}div.aboutSection td.leftPanel a:hover{
+					color:#933;text-decoration:underline
+				}div.aboutSection td.rightPanel a{
+					color:#666;text-decoration:none
+				}div.aboutSection td.rightPanel a:hover{
+					color:#933;text-decoration:underline}
 
 #layout-menu {
 	background: #f6f6f6;
@@ -64,7 +148,7 @@ a, a > tt {
 }
 
 a:hover {
-	border-bottom: 1px gray dotted;
+	color:#933;
 }
 
 #layout-menu a.current:link, #layout-menu a.current:visited {
