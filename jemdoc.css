@@ -24,7 +24,7 @@ div#OuterCanvas{
 			min-height:400px;
 			margin:30px auto 50px auto;
 			border:1px solid #ccc;
-			border-top-right-radius:70px;
+			border-top-right-radius:50px;
 			border-bottom-left-radius:35px;
 			box-shadow:0 0 24px #bbb;
 			background:rgb(255, 255, 255)}
