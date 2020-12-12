@@ -458,3 +458,10 @@ table.imgtable, table.imgtable td {
     border: none;
     text-align: left;
 }
+
+a.externallink {
+	background-image: url(ExternalLink.svg);
+	background-position: right;
+	background-repeat: no-repeat;
+	padding-right: 14px;
+}
