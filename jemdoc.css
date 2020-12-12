@@ -460,7 +460,7 @@ table.imgtable, table.imgtable td {
 }
 
 a.externallink {
-	background-image: url(ExternalLink.svg);
+	background-image: url(ExternalLink.gif);
 	background-position: right;
 	background-repeat: no-repeat;
 	padding-right: 14px;
