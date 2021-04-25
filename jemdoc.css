@@ -8,7 +8,7 @@ body {
 	background: hsl(0, 0%, 100%);
 	font-family: 'Open Sans', sans-serif;
 	padding-bottom: 10px;
-	font-size:85%;
+	font-size:83%;
 }
 
 div#OuterCanvas{
@@ -20,7 +20,7 @@ div#OuterCanvas{
 		div#Page{
 			display:inline-block;
 			text-align:left;
-			width:1040px;
+			width:1060px;
 			min-height:400px;
 			margin:30px auto 50px auto;
 			border:1px solid #ccc;
@@ -31,7 +31,7 @@ div#OuterCanvas{
 			div#Float{
 				position:fixed;
 				visibility:hidden;
-				width:1000px;
+				width:1030px;
 				top:0;
 				left:0;
 				border-left:1px solid #ccc;
@@ -125,7 +125,7 @@ div#OuterCanvas{
     text-align: left;
 	vertical-align: top;
 	line-height: 1.5em;
-	width: 940px;
+	width: 960px;
 	margin: auto;
 }
 
