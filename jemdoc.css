@@ -20,7 +20,7 @@ div#OuterCanvas{
 		div#Page{
 			display:inline-block;
 			text-align:left;
-			width:1060px;
+			width:1080px;
 			min-height:400px;
 			margin:30px auto 50px auto;
 			border:1px solid #ccc;
@@ -125,7 +125,7 @@ div#OuterCanvas{
     text-align: left;
 	vertical-align: top;
 	line-height: 1.5em;
-	width: 960px;
+	width: 980px;
 	margin: auto;
 }
 
