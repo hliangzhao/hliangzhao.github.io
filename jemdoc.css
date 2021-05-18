@@ -31,7 +31,7 @@ div#OuterCanvas{
 			div#Float{
 				position:fixed;
 				visibility:hidden;
-				width:1030px;
+				width:1040px;
 				top:0;
 				left:0;
 				border-left:1px solid #ccc;
@@ -103,7 +103,7 @@ div#OuterCanvas{
 	padding-top: 0.5em;
 	padding-left: 0px;
 	padding-right: 0px;
-	font-size: 86%;
+	font-size: 84%;
 	width: auto;
 	white-space: nowrap;
     text-align: left;
