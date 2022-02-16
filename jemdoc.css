@@ -6,9 +6,9 @@ table#tlayout {
 
 body {
 	background: hsl(0, 0%, 100%);
-	font-family: 'Open Sans', sans-serif;
+	font-family: 'Merriweather', sans-serif;
 	padding-bottom: 10px;
-	font-size:84%;
+	font-size: 85%;
 }
 
 div#OuterCanvas{
@@ -22,7 +22,7 @@ div#OuterCanvas{
 			text-align:left;
 			width:940px;
 			min-height:400px;
-			margin:30px auto 50px auto;
+			margin: 20px auto 30px auto;
 			border:1px solid #ccc;
 			border-top-right-radius:50px;
 			border-bottom-left-radius:35px;
