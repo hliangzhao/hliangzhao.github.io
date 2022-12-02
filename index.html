@@ -6,9 +6,7 @@
     <meta name="generator" content="jemdoc, see http://jemdoc.jaboc.net/" />
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
     <link rel="stylesheet" href="jemdoc.css" type="text/css" />
-    <!-- <link href="https://fonts.googleapis.com/css?family=Lato:300,300i,400,400i,700&subset=latin-ext" rel="stylesheet"> -->
     <link href="https://fonts.googleapis.com/css?family=Raleway:400,400i,700" rel="stylesheet" type="text/css">
-    <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,400i,600,600i&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,400;0,700;1,400;1,700&amp;display=swap" rel="stylesheet">
     <title>Hailiang Zhao @ ZJU.CS.CCNT</title>
 </head>
@@ -37,13 +35,12 @@
                 <p align="center"><a href="http://www.zju.edu.cn/english/" target="_blank"><img src="ZJU.png" width="80%" align="top" border="0"></a></p>
                 <p align="center"><img src="slogan.png" width="70%" border="0"></p>
                 <p align="center"><a href="https://www.ntu.edu.sg/" target="_blank"><img src="ntu.svg" width="60%" align="top" border="0"></a></p>
-                <!-- <p align="center"><a href="http://ccnt.zju.edu.cn/" target="_blank"><img src="lab.png" width="95%" height="95%" border="0"></a></p> -->
                 <p align="center"><img src="quote.png" width="96%" border="0"></p>
             </td>
         </tr>
     </table>
     <h2><font color="brown">Biography</font></h2>
-    <p align='justify'>Currently I am a fourth-year Ph.D. student of College of Computer Science and Technology (CCST), 
+    <p align='justify'>Currently I am a fourth-year Ph.D. student of College of Computer Science and Technology, 
         <a class="externallink" href="http://www.zju.edu.cn/english" target="_blank">Zhejiang University</a>. Before my Ph.D. career, I 
         was an undergraduate student from <a class="externallink" href="http://whut.edu.cn/" target="_blank">Wuhan University of Technology</a> and 
         received my B.Eng. degree in Computer Science and Technology on June, 2019.
@@ -64,34 +61,30 @@
         Technology blogs on related topics are available at <a class="externallink" target="_blank" href="https://hliangzhao.cn/">hliangzhao.cn</a>.</p>
 
     <h2><font color="brown">Research Interests</font></h2>
-        <p>I am interested in <b>Cloud & Edge Computing</b>, <b>Distributed Systems</b>, and <b>Network Management</b>.
-            Currently I am focusing on: <br />
+        <p align='justify'>Currently I am focusing on <b>Cloud & Edge Computing</b>, <b>Distributed Computing & Systems</b>, and <b>Optimization Algorithm Design & Analysis</b>. 
+            Recently, I pay great attention to the following topics: <br />
             <ul>
-                <li align='justify'><b>Dependent Task Scheduling & Online Resource Allocation</b><br />
-                    Cluster schedulers are key to realizing improvements in resource utilization for the cloud-native apps. 
-                    Current cluster schedulers rely on heuristics that prioritize generality, ease of understanding, and 
-                    straightforward implementation over achieving the ideal performance on a specific workload. 
-                    However, they ignore readily available information about job structure (i.e., internal dependencies) 
-                    and efficient parallelism for jobs’ input sizes. How to design a better online resource allocation algorithm (mechanism) 
-                    is of importance. 
+                <li align='justify'><b>Resource Allocation & Job Scheduling Algorithms with Theoretical Guarantees</b><br />
+                    Scheduling algorithms are key to realizing improvements in resource utilization for the cloud-native applications. 
+                    I am interested with the design and analysis of scheduling algorithms for large-scale clusters, DCs, cluster federations, etc. 
+                    Currently I put special effort on deep learning workload scheduling in GPU clusters.
                 </li>
-                <li align='justify'><b>AI-driven Optimization</b><br />
-                    In our <a class="externallink" href="./papers/EI.pdf" target="_blank">Edge Intelligence paper</a>, we divide Edge 
-                    Intelligence into <i>AI for edge</i>  and <i>AI on edge</i>. The former focuses on providing a more optimal solution 
-                    to the key concerns in Edge Computing with the help of popular and resultful AI technologies while the latter studies 
-                    how to carry out the entire process of AI models, i.e., model training and inference, on edge. What I put emphasis on 
-                    is that how to apply AI-based models, especially reinforcement learning and graph neural networks, to improve the QoE. 
+                <li align='justify'><b>Ready-for-Use Cluster Schedulers in K8s-Native Systems</b><br />
+                    K8s (Kubernetes) is an open-source system for automating deployment, scaling, and management of containerized applications.
+                    <i>Kube-scheduler</i> is the default component responsible for the scheduling of pods (a set of inter-related containers). By leveraging 
+                    the power of CRD (Custom Resource Definition), customer schedulers can be designed. I am interested with the R&D of 
+                    customer schedulers for various batch & elastic workloads. 
                 </li>
             </ul>
         </p>
     </ul>
     <h2><font color="brown">Selected Publications</font></h2> </font>
-        <ul>
+        <ul >
         <li align='justify'><b><u>Hailiang Zhao</u></b>, Shuiguang Deng*, Jianwei Yin, Schahram Dustdar, and Albert Y. Zomaya, 
             <a href="https://arxiv.org/pdf/2112.02456.pdf" target="_blank"><i>Theoretically Guaranteed Online Workload Dispatching for Deadline-Aware Multi-Server Jobs</i></a>. In: <b><font face='Raleway'>arXiv preprints</font></b>. </li>
         
         <li align='justify'><b><u>Hailiang Zhao</u></b>, Shuiguang Deng*, Feiyi Chen, Jianwei Yin, Schahram Dustdar, and Albert Y. Zomaya, 
-            <a href="https://arxiv.org/pdf/2204.04371.pdf" target="_blank"><i>Learning to Schedule Multi-Server Jobs with Fluctuated Processing Speeds</i></a>. In: <b><font face='Raleway'>IEEE Trans. on Parallel and Distributed Systems (TPDS)</font></b>, doi: 10.1109/TPDS.2022.3215947. <font color="grey">(CCF A)</font> </li>
+            <a href="./papers/ESDP.pdf" target="_blank"><i>Learning to Schedule Multi-Server Jobs with Fluctuated Processing Speeds</i></a>. In: <b><font face='Raleway'>IEEE Trans. on Parallel and Distributed Systems (TPDS)</font></b>, doi: 10.1109/TPDS.2022.3215947. <font color="grey">(CCF A)</font> </li>
 
         <li align='justify'>Haowei Chen, Shuiguang Deng, Hongze Zhu, <b>Hailiang Zhao</b>, Rong Jiang, Schahram Dustdar, and Albert Y. Zomaya, 
             <a href="./papers/offloading-TPDS.pdf" target="_blank"><i>Mobility-aware Offloading and Resource Allocation for Distributed Services Collaboration</i></a>. 
@@ -103,7 +96,7 @@
             </li>
 
         <li align='justify'><b><u>Hailiang Zhao</u></b>, Shuiguang Deng*, Zijie Liu, Zhengzhe Xiang, Jianwei Yin, Schahram Dustdar, and Albert Y. Zomaya, 
-            <a href="https://arxiv.org/pdf/2012.14108.pdf" target="_blank"><i>DPoS: Decentralized, Privacy-Preserving, and Low-Complexity Online Slicing 
+            <a href="./papers/DPoS.pdf" target="_blank"><i>DPoS: Decentralized, Privacy-Preserving, and Low-Complexity Online Slicing 
             for Multi-Tenant Networks</i></a>. In: <b><font face='Raleway'>IEEE Trans. on Mobile Computing (TMC)</font></b>, doi: 10.1109/TMC.2021.3074934.
             <a href="./slides/dpos.pdf" target="_blank">[Slide]</a> <font color="grey">(CCF A)</font> </li>
 
@@ -117,7 +110,7 @@
 
         <li align='justify'><b><u>Hailiang Zhao</u></b>, Shuiguang Deng*, Zijie Liu, Jianwei Yin, and Schahram Dustdar, 
             <a href="./papers/rs.pdf" target="_blank"><i>Distributed Redundant Placement for Microservice-based Applications at the Edge</i></a>.
-            In: <b><font face='Raleway'>IEEE Trans. on Services Computing (TSC)</font></b>, doi: 10.1109/TSC.2020.3013600. <font color=#B40404>[<b>ESI Highly Cited Paper</b>]</font> <font color="grey">(CCF B)</font></li>
+            In: <b><font face='Raleway'>IEEE Trans. on Services Computing (TSC)</font></b>, doi: 10.1109/TSC.2020.3013600. <font color=#B40404>[<b>ESI Highly Cited Paper</b>]</font> <font color="grey">(CCF A)</font></li>
 
         <li align='justify'>Shuiguang Deng, Guanjie Cheng, <b>Hailiang Zhao</b>, Honghao Gao, and Jianwei Yin, 
             <a href="./papers/blockchain.pdf" target="_blank"><i>Incentive-driven Computation Offloading in Blockchain-enabled E-commerce</i></a>. 
@@ -126,7 +119,7 @@
         <li align='justify'>Shuiguang Deng, <b><u>Hailiang Zhao</u></b>, Weijia Fang*, Jianwei Yin, Schahram Dustdar, and Albert Y. Zomaya, 
             <a href="./papers/EI.pdf" target="_blank"><i>Edge Intelligence: The Confluence of Edge Computing and Artificial Intelligence</i></a>.
             In: <b><font face='Raleway'>IEEE Internet of Things Journal (IOTJ)</font></b>, vol. 7, no. 8, pp. 7457-7469, Aug. 2020, doi: 10.1109/JIOT.2020.2984887. <font color=#B40404>[<b>ESI Highly Cited Paper</b>]</font> 
-            <font color=#B40404>[<b>ESI Hot Paper</b>]</font> </li>
+            <font color=#B40404>[<b>ESI Hot Paper</b>]</font> <font color="grey">(CCF C)</font></li>
 
         <li align='justify'><b><u>Hailiang Zhao</u></b>, Shuiguang Deng*, Cheng Zhang, Wei Du, Qiang He, and Jianwei Yin,
             <a href="./papers/cross_edge_offloading.pdf" target="_blank"><i>A Mobility-aware Cross-edge Computation Offloading 
@@ -139,7 +132,7 @@
             <a href="./papers/deployment_with_DQN.pdf" target="_blank"><i>Data-intensive Application Deployment at Edge: 
                 A Deep Reinforcement Learning Approach</i></a>.
             In: <b><font face='Raleway'>Proceedings of the 17th IEEE International Conference on Web Services (ICWS '19)</font></b>, 
-            Milan, Italy, 2019. </li>
+            Milan, Italy, 2019. <font color="grey">[Short Paper]</font></li>
 
         <li align='justify'><b><u>Hailiang Zhao</u></b>, Wei Du, Wei Liu, Tao Lei, and Qiwang Lei,
             <a href="./papers/UIC_2018_paper_85.pdf" target="_blank"><i>QoE Aware and Cell Capacity Enhanced Computation Offloading for Multi-Server 
@@ -152,7 +145,7 @@
     <ul>
 		<li align='justify'>The CSC Scholarship, Aug 2022.</li>
         <li align='justify'>
-            The Outstanding Postgraduates Award of CCST, Zhejiang University, 2020 & 2021.
+            The Outstanding Postgraduates Award of College of CS, Zhejiang University, 2020 & 2021.
         </li>
         <li align='justify'>
             The Doctoral Freshman Scholarship of Zhejiang University, Sep 2019.

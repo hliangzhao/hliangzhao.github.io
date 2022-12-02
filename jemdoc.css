@@ -465,3 +465,7 @@ a.externallink {
 	background-repeat: no-repeat;
 	padding-right: 14px;
 }
+
+ul li{
+	padding-bottom: 2px;
+ }
