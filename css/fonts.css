@@ -1,5 +1,9 @@
 body {
   font-family: Merriweather, Raleway, sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  font-variation-settings:
+    "wdth" 100;
 }
 code {
   font-family: "Lucida Console", Monaco, monospace;
