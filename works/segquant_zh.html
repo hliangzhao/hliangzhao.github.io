@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="SegQuant 论文技术解读：面向扩散模型的语义感知、可部署量化框架。">
+  <title>SegQuant 论文解读 | 赵海亮</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700&amp;family=Source+Serif+4:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css?v=20260830">
+  <script src="/js/mathjax-config.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+<body>
+  <header class="site-header"><nav class="nav container" aria-label="主导航"><a class="brand" href="/index_zh.html"><span class="brand-mark">HZ</span> 赵海亮</a><div class="nav-links"><a href="/index_zh.html#contributions">研究工作</a><a href="/index_zh.html#publications">代表论文</a><a class="lang-link" href="/works/segquant.html" lang="en">English</a></div></nav></header>
+
+  <main>
+    <section class="article-hero"><div class="article-shell">
+      <div class="article-kicker">CVPR 2026 &middot; 生成式人工智能系统</div>
+      <h1>SegQuant</h1>
+      <p class="article-deck">量化的不只是张量中的数值，更是这组张量在计算图中承担的语义。</p>
+      <p class="article-authors">Jiaji Zhang, Ruichao Sun, Hailiang Zhao, Jiaju Wu, Peng Chen, Hao Li, Yuying Liu, Kingsum Chow, Gang Xiong, and Shuiguang Deng</p>
+      <div class="article-actions"><a class="button button-primary" href="https://arxiv.org/abs/2507.14811" target="_blank" rel="noopener">论文 &#8599;</a><a class="button button-secondary" href="https://optisys-zju.github.io/segquant/" target="_blank" rel="noopener">项目主页 &#8599;</a><a class="button button-secondary" href="https://github.com/OptiSys-ZJU/segquant" target="_blank" rel="noopener">代码 &#8599;</a></div>
+    </div></section>
+
+    <article class="article-main article-shell article-body">
+      <p class="article-lead">多数后训练量化方法把线性层看成一个完整的数值矩阵。SegQuant 还会追问：输入从哪里来，输出将流向哪里。它从计算图中自动识别语义分段，分别量化各个区域，并通过硬件原生的双尺度执行路径保留正负激活的不对称性。</p>
+
+      <div class="article-summary">
+        <article><strong>SegLinear</strong><span>从计算图拓扑发现语义分段，无需人工维护层名单。</span></article>
+        <article><strong>DualScale</strong><span>分别保留负值与非负激活所需的数值分辨率。</span></article>
+        <article><strong>面向实际部署</strong><span>继续使用定长整数 GEMM、批处理和融合后处理。</span></article>
+      </div>
+
+      <h2>1. 为什么只看张量数值还不够</h2>
+      <p>扩散模型会在多个去噪时间步中反复调用同一主干网络，因此单层误差也可能不断传播。DiT 类模型还有一层特殊困难：<code>chunk</code>、<code>split</code>、<code>concat</code>、<code>reshape</code> 等操作表明，一个物理线性层中可能融合了多种计算语义。</p>
+      <p>例如，AdaNorm 的线性层会同时产生注意力与 MLP 分支所需的 shift、scale 和 gate 参数。不同部分的数值范围、用途与量化敏感度并不相同。若整个矩阵共用一套量化配置，大范围区域会主导量化器，让较小但更敏感的区域失去分辨率，这就是语义分段之间的量化干扰。</p>
+      <div class="math-block"><div class="math-caption">传统的统一量化视角</div>
+        \[
+          Y=XW, \qquad \widehat{Y}=Q(X)Q(W).
+        \]
+        <p>这一写法没有表达 \(X\) 与 \(W\) 在计算图中的语义。SegQuant 先恢复结构，再决定如何量化。</p>
+      </div>
+
+      <h2>2. SegLinear：从计算图拓扑识别语义</h2>
+      <p>SegLinear 使用 <code>torch.fx</code> 完成符号追踪和拓扑模式匹配。它不依赖具体模型名称，而是在线性算子附近寻找两类可复用结构。</p>
+
+      <h3>输出分段量化</h3>
+      <p>若线性层输出随后被 <code>chunk</code> 或 <code>split</code> 拆分，说明不同输出区间会流向不同分支。SegLinear 沿输出维度拆分权重矩阵，再分别量化：</p>
+      <div class="math-block">
+        \[
+          W=[W_1,W_2,\ldots,W_N], \qquad
+          \widehat{Y}=[\widehat{X}\widehat{W}_1,\widehat{X}\widehat{W}_2,\ldots,\widehat{X}\widehat{W}_N].
+        \]
+      </div>
+
+      <h3>输入分段量化</h3>
+      <p>若输入由 <code>concat</code> 或改变结构的 <code>reshape</code> 产生，不同输入通道来自不同计算路径。SegLinear 同时划分输入和权重矩阵对应的行：</p>
+      <div class="math-block">
+        \[
+          X=[X_1,X_2,\ldots,X_N], \qquad
+          W=[W_1^{\mathsf T},W_2^{\mathsf T},\ldots,W_N^{\mathsf T}]^{\mathsf T},
+        \]
+        \[
+          \widehat{Y}=\sum_{i=1}^{N}\widehat{X}_i\widehat{W}_i.
+        \]
+      </div>
+      <p>每个分段的宽度直接从计算图元数据中推断。随后，各分段可以独立使用 SmoothQuant、GPTQ、SVDQuant 等优化器和校准参数。这样，结构发现与数值优化便不再绑定。</p>
+
+      <figure class="web-figure">
+        <div class="web-figure-title">SegQuant 从计算图到执行内核的流程</div>
+        <div class="mechanism-flow" aria-label="SegQuant 工作流程">
+          <div class="flow-step"><strong>追踪计算图</strong>构建包含张量形状和依赖关系的静态算子图。</div>
+          <div class="flow-step flow-step-accent"><strong>识别语义</strong>匹配 concat-to-linear 与 linear-to-split 模式。</div>
+          <div class="flow-step"><strong>划分张量</strong>切分相应输入通道或权重区域。</div>
+          <div class="flow-step flow-step-accent"><strong>局部优化</strong>按语义一致区域分别校准与量化。</div>
+          <div class="flow-step"><strong>下沉到内核</strong>以低比特 GEMM 执行，并融合结果重构。</div>
+        </div>
+        <figcaption>该流程图由网页原生元素绘制，可在不同分辨率下保持清晰。</figcaption>
+      </figure>
+
+      <h2>3. DualScale：不改变位宽，保留正负极性</h2>
+      <p>SiLU 与 GELU 会保留大量绝对值较小的负激活，同时产生范围宽得多的正激活。若正负数共用一个步长，正向离群值会主导量化尺度，狭窄负区间只能分到很少的量化格点。论文发现，这些负激活恰好承载扩散生成中的高频纹理与细节。</p>
+      <p>DualScale 分别为负区间和非负区间设置步长：</p>
+      <div class="math-block"><div class="math-caption">极性感知量化</div>
+        \[
+          Q_{\mathrm{dual}}(x)=
+          \begin{cases}
+            \operatorname{round}(x/s_-), &amp; x&lt;0,\\
+            \operatorname{round}(x/s_+), &amp; x\geq0,
+          \end{cases}
+        \]
+        \[
+          s_-=\frac{|\min(X)|}{q_{\min}}, \qquad
+          s_+=\frac{\max(X)}{q_{\max}}.
+        \]
+      </div>
+      <p>令 \(X_+=\max(X,0)\)，\(X_-=\min(X,0)\)，线性结果可以写为</p>
+      <div class="math-block">
+        \[
+          Y\approx (s_+s_w)\widehat{X}_+\widehat{W}+(s_-s_w)\widehat{X}_-\widehat{W}.
+        \]
+      </div>
+      <p>虽然公式中出现两次矩阵乘法，实现上会把它们合并为一次 BatchedGEMM，并在融合 epilogue 中完成缩放与求和。因此，DualScale 继续使用标准定长整数算术，无需定制数值格式，也不额外启动执行内核。</p>
+
+      <h2>4. 两个机制为什么互补</h2>
+      <div class="technical-grid">
+        <article class="technical-card"><h3>SegLinear 解决结构干扰</h3><p>不同语义分支不再相互决定量化参数。</p></article>
+        <article class="technical-card"><h3>DualScale 解决极性干扰</h3><p>宽正区间不再吞噬窄负区间的数值分辨率。</p></article>
+        <article class="technical-card"><h3>不绑定优化器</h3><p>两个机制都封装在已有 PTQ 优化器外部，而不是再造一套模型专用方法。</p></article>
+        <article class="technical-card"><h3>兼容编译器</h3><p>静态图检测与标准低比特 GEMM 能够接入现有部署工具链。</p></article>
+      </div>
+
+      <h2>5. 实验证据</h2>
+      <p>论文覆盖 SD3.5、FLUX.1-dev、SDXL，包含 DiT 与 UNet 两类骨干、INT8 与 INT4 配置，以及 COCO、MJHQ-30K、DCI 三个图像集。下表在 SD3.5 W8A8 设置下分别加入两个核心模块。</p>
+      <div class="table-scroll"><table class="technical-table">
+        <caption>MJHQ-30K 上的消融实验，SD3.5 W8A8</caption>
+        <thead><tr><th>方法</th><th>FID ↓</th><th>Image Reward ↑</th><th>LPIPS ↓</th><th>PSNR ↑</th><th>SSIM ↑</th></tr></thead>
+        <tbody>
+          <tr><td>基线</td><td>23.35</td><td>0.877</td><td>0.419</td><td>11.93</td><td>0.536</td></tr>
+          <tr><td>+ SegLinear</td><td>23.36</td><td>0.899</td><td>0.395</td><td>12.03</td><td>0.554</td></tr>
+          <tr><td>+ DualScale</td><td>22.61</td><td>0.909</td><td>0.401</td><td>12.14</td><td>0.551</td></tr>
+          <tr class="highlight"><td>+ SegLinear + DualScale</td><td>22.54</td><td>0.952</td><td>0.377</td><td>12.50</td><td>0.567</td></tr>
+        </tbody>
+      </table></div>
+      <p>逐层测量进一步解释了质量提升的来源。采用 GPTQ 时，<code>DiT.11.norm1 context</code> 的 Frobenius 量化误差在语义划分后从 \(3.0176\) 降至 \(1.7637\)。同样趋势出现在 SmoothQuant、SVDQuant 和 GPTQ 上，说明收益来自图结构划分，而不是某个特定优化器。</p>
+
+      <div class="table-scroll"><table class="technical-table">
+        <caption>RTX 4090 上部署 SD3.5 的资源开销</caption>
+        <thead><tr><th>配置</th><th>峰值显存 (GiB)</th><th>主干大小 (GiB)</th><th>单步时延 (ms)</th></tr></thead>
+        <tbody>
+          <tr><td>FP16</td><td>18.63</td><td>3.88</td><td>317.18</td></tr>
+          <tr><td>INT8 基线</td><td>16.73</td><td>2.00</td><td>278.86</td></tr>
+          <tr class="highlight"><td>SegQuant-8</td><td>16.72</td><td>2.02</td><td>287.85</td></tr>
+          <tr><td>INT4 基线</td><td>16.06</td><td>1.29</td><td>209.78</td></tr>
+          <tr class="highlight"><td>SegQuant-4</td><td>16.12</td><td>1.42</td><td>212.87</td></tr>
+        </tbody>
+      </table></div>
+      <div class="result-strip">
+        <article><strong>22.54 FID</strong><span>完整方法优于 W8A8 消融基线的 23.35。</span></article>
+        <article><strong>0.952 IR</strong><span>两个模块同时启用后，Image Reward 从 0.877 提高到 0.952。</span></article>
+        <article><strong>W4 仅增 1.5%</strong><span>SegQuant-4 相比 INT4 基线每步增加 3.09 ms，仍保留主要效率收益。</span></article>
+      </div>
+      <div class="article-note"><strong>如何理解这些结果？</strong> SegQuant 并不宣称语义处理没有成本。它会增加少量时延与尺度存储，系统贡献在于：执行代价仍接近普通 INT8 或 INT4，而生成质量指标得到稳定改善。</div>
+
+      <h2>6. 更广的研究方向</h2>
+      <p>SegQuant 把模型结构视为部署信息。Shiva-DiT 从另一个角度延续这一方向，通过基于残差的可微 top-k 选择，学习哪些 Transformer 计算应当保留。两项工作都强调结构感知效率，而不是对每个参数、激活或 token 采用完全相同的近似。</p>
+
+      <section class="article-related"><h2>相关工作</h2><div class="article-related-links"><a href="https://arxiv.org/abs/2602.05605" target="_blank" rel="noopener">Shiva-DiT：可微 top-k 选择 &#8599;</a><a href="/index_zh.html#contributions">生成式人工智能系统研究</a></div></section>
+    </article>
+  </main>
+
+  <footer class="site-footer"><div class="container footer-inner"><span>&copy; 2026 赵海亮 &middot; 浙江大学</span><span><a href="/index_zh.html">主页</a></span></div></footer>
+</body>
+</html>

@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="A technical guide to RPB, an ICML 2026 Spotlight paper on near-optimal robustness in learning-augmented paging.">
+  <title>RPB | Hailiang Zhao</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Source+Serif+4:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css?v=20260830">
+  <script src="/js/mathjax-config.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+<body>
+  <header class="site-header"><nav class="nav container" aria-label="Primary navigation">
+    <a class="brand" href="/index.html"><span class="brand-mark">HZ</span> Hailiang Zhao</a>
+    <div class="nav-links"><a href="/index.html#contributions">Research</a><a href="/index.html#publications">Publications</a><a class="lang-link" href="/works/rpb_zh.html" lang="zh-CN">中文</a></div>
+  </nav></header>
+
+  <main>
+    <section class="article-hero"><div class="article-shell">
+      <div class="article-kicker">ICML 2026 Spotlight &middot; Learning-augmented algorithms</div>
+      <h1>Towards Optimal Robustness in Learning-Augmented Paging</h1>
+      <p class="article-deck">How can a paging algorithm exploit accurate predictions without letting bad predictions destroy its worst-case guarantee?</p>
+      <p class="article-authors">Peng Chen, Hailiang Zhao, Xueyan Tang, Yixuan Wang, and Shuiguang Deng</p>
+      <div class="article-actions"><a class="button button-primary" href="https://arxiv.org/pdf/2606.01342" target="_blank" rel="noopener">Paper &#8599;</a><a class="button button-secondary" href="https://github.com/Natureal/ICML-Cache-Coliseum" target="_blank" rel="noopener">Code &#8599;</a><a class="button button-secondary" href="/index.html#publications">Back to publications</a></div>
+    </div></section>
+
+    <article class="article-main article-shell article-body">
+      <p class="article-lead">RPB turns trust in a prediction into an explicit resource. A prediction-guided eviction is allowed only when the algorithm has earned enough budget relative to an optimally robust online baseline. This simple design principle yields optimal behavior with perfect advice and near-optimal robustness when advice is arbitrary.</p>
+
+      <div class="article-summary">
+        <article><strong>1-consistency</strong><span>Perfect next-arrival predictions recover the offline optimum.</span></article>
+        <article><strong>\(H_k+O(1)\) robustness</strong><span>The worst-case ratio is optimal up to an additive constant.</span></article>
+        <article><strong>Logarithmic smoothness</strong><span>Cost degrades with normalized prediction error rather than abruptly.</span></article>
+      </div>
+
+      <h2>1. The decision problem</h2>
+      <p>A cache stores at most \(k\) pages. Requests \(\sigma=\langle p_1,\ldots,p_n\rangle\) arrive online. A miss costs one unit and may force an eviction. Belady's rule evicts the page requested farthest in the future, but it requires perfect knowledge of the request sequence.</p>
+      <div class="math-block"><div class="math-caption">Competitive performance</div>
+        \[
+          \operatorname{cost}(A,\sigma)
+          \leq \alpha\,\operatorname{cost}(\mathrm{OPT},\sigma)+c.
+        \]
+        <p>Classical randomized paging achieves the optimal competitive ratio \(H_k=\sum_{i=1}^{k}1/i\). A learning-augmented method should approach OPT when predictions are accurate while retaining a comparable bound when they are wrong.</p>
+      </div>
+
+      <h3>Three guarantees, not one</h3>
+      <div class="technical-grid">
+        <article class="technical-card"><h3>Consistency</h3><p>With perfect predictions, the ratio should be as small as possible. RPB-OM achieves \(1\), so it is offline optimal in this regime.</p></article>
+        <article class="technical-card"><h3>Robustness</h3><p>With arbitrary predictions, cost must remain bounded by a competitive online baseline. RPB-OM achieves \(H_k+O(1)\).</p></article>
+        <article class="technical-card"><h3>Smoothness</h3><p>For intermediate error \(\eta_1\), performance should deteriorate gradually. RPB-OM obtains \(O(1+\log(\eta_1/\operatorname{cost}(\mathrm{OPT})))\).</p></article>
+        <article class="technical-card"><h3>The tension</h3><p>Every prediction-based eviction can improve consistency, but it can also move the cache away from a robust baseline. The algorithm must account for that divergence.</p></article>
+      </div>
+
+      <h2>2. Why earlier trust rules leave a gap</h2>
+      <p>Prior algorithms also limit prediction use, but their accounting is too coarse. Global switching compares cumulative costs and can miss locally useful advice. Fixed eviction-chain thresholds either spend too much trust under severe error or stop too early when predictions remain useful.</p>
+      <ol class="principle-list">
+        <li><span class="term">Prediction quality is local.</span> A predictor may be excellent for one eviction chain and poor for the next. One global score cannot express this variation.</li>
+        <li><span class="term">Trust should be relative.</span> The meaningful reference is not elapsed time, but the progress that a robust baseline would have made in the same state.</li>
+        <li><span class="term">Every deviation needs payment.</span> A prediction-driven decision can increase the distance from the baseline cache, so it must consume a resource that appears in the analysis.</li>
+      </ol>
+
+      <h2>3. Relative prediction budget</h2>
+      <p>RPB is built on ONOPT, a class of paging algorithms that maintains a valid cache configuration through the work-function layer structure. Its efficient instance, OnlineMin (OM), samples the same distribution as an optimally competitive randomized algorithm and updates each request in \(O(\log k)\) time.</p>
+      <p>The key state variable is a nonnegative budget \(B\). A request to the zero layer \(L_0\) represents maximal uncertainty. At such a miss, RPB follows the prediction and resets \(B\) to a constant \(\tau\). On later lazy-adversary misses, it compares the effectiveness of previous evictions with OM and decides whether more budget has been earned.</p>
+
+      <figure class="web-figure">
+        <div class="web-figure-title">One RPB-OM decision cycle</div>
+        <div class="mechanism-flow" aria-label="RPB-OM decision flow">
+          <div class="flow-step"><strong>Request arrives</strong>Identify its work-function layer and OM candidate set.</div>
+          <div class="flow-step flow-step-accent"><strong>\(L_0\) miss</strong>Evict by predicted next-arrival priority and set \(B\leftarrow\tau\).</div>
+          <div class="flow-step"><strong>Measure progress</strong>Track unrevealed layers \(U(\omega)\) since the previous miss.</div>
+          <div class="flow-step"><strong>Gate budget</strong><span>Earn one unit only if<br><span class="flow-formula">\(U(\omega)\leq\)<br>\((Y+2)/e-2\)</span>.</span></div>
+          <div class="flow-step flow-step-accent"><strong>Choose eviction</strong>If \(B&gt;0\), use prediction and spend one; otherwise follow OM.</div>
+        </div>
+        <figcaption>The budget is not a confidence score produced by the predictor. It is online evidence that recent prediction-guided evictions have performed well relative to the robust baseline.</figcaption>
+      </figure>
+
+      <h3>Why the gate uses unrevealed layers</h3>
+      <p>Let \(U(\omega)=k-|R(\omega)|\) be the number of unrevealed work-function layers. As lazy requests reveal layers, OM's potential drops by at least a harmonic amount. The gate tests whether enough of this baseline progress has accumulated to pay for another prediction-based deviation. This creates a fine-grained connection between advice effectiveness and robust progress without simulating OM's full cache distribution.</p>
+
+      <h2>4. The proof mechanism</h2>
+      <p>The proof does not analyze prediction cost in isolation. It combines three quantities in one potential:</p>
+      <div class="math-block"><div class="math-caption">Potential for RPB-OM</div>
+        \[
+          \Phi(\omega)=\phi(\omega)+D(\omega)+B(\omega).
+        \]
+        <p>Here, \(\phi\) is OM's remaining adversarial cost, \(D\) is the expected cache difference between RPB-OM and OM, and \(B\) is unspent prediction budget.</p>
+      </div>
+      <p>At an \(L_0\) miss, the algorithm may increase both cache divergence and budget, but the increase is only \(O(1)\) beyond OM's \(H_k-1\) potential change. During later lazy requests, a prediction-based miss spends budget, while an OM-based miss reduces cache divergence. In both cases, the amortized cost is nonpositive. Summing these inequalities gives the worst-case theorem.</p>
+      <div class="article-note"><strong>What is close to optimal?</strong> Exact \(H_k\)-robustness would require following the classical optimal online algorithm without using predictions. RPB-OM reaches \(H_k+O(1)\), the strongest possible form for a genuinely prediction-using design up to an additive constant.</div>
+
+      <h2>5. What the experiments establish</h2>
+      <p>The evaluation combines synthetic log-normal noise with two real predictors, PLECO and POPU, on SPEC CPU 2006 memory traces. The table below reports averages from the paper. Lower cost ratio and higher hit ratio are better.</p>
+      <div class="table-scroll"><table class="technical-table">
+        <caption>Average results with real next-arrival predictors</caption>
+        <thead><tr><th rowspan="2">Method</th><th colspan="2">PLECO</th><th colspan="2">POPU</th></tr><tr><th>Cost ratio</th><th>Hit ratio</th><th>Cost ratio</th><th>Hit ratio</th></tr></thead>
+        <tbody>
+          <tr><td>BlindOracle</td><td>1.404</td><td>15.92</td><td>1.261</td><td>21.75</td></tr>
+          <tr><td>BlindOracle &amp; LRU</td><td>1.286</td><td>20.53</td><td>1.230</td><td>23.10</td></tr>
+          <tr><td>ONOPT-OM</td><td>1.253</td><td>22.42</td><td>1.237</td><td>23.76</td></tr>
+          <tr class="highlight"><td>RPB-OM, \(\tau=1\)</td><td>1.249</td><td>22.75</td><td>1.220</td><td>24.34</td></tr>
+          <tr class="highlight"><td>RPB-OM, \(\tau=2\)</td><td>1.252</td><td>22.70</td><td>1.215</td><td>24.49</td></tr>
+          <tr class="highlight"><td>RPB-OM, \(\tau=4\)</td><td>1.254</td><td>22.64</td><td>1.213</td><td>24.55</td></tr>
+        </tbody>
+      </table></div>
+      <div class="result-strip">
+        <article><strong>1.249</strong><span>Best PLECO average cost ratio, achieved by RPB-OM with \(\tau=1\).</span></article>
+        <article><strong>1.213</strong><span>Best POPU average cost ratio, achieved by RPB-OM with \(\tau=4\).</span></article>
+        <article><strong>Stable across \(\tau\)</strong><span>The practical result changes little from \(\tau=1\) to \(4\), reducing tuning sensitivity.</span></article>
+      </div>
+      <p>Synthetic-noise experiments answer a different question: prediction-only methods can deteriorate sharply as noise grows, while RPB-OM stays controlled. Together, the two evaluations show that the guarantee is not merely defensive. The algorithm still extracts measurable value from realistic predictors.</p>
+
+      <h2>6. The broader idea</h2>
+      <p>The most reusable contribution is an accounting principle: learned advice should earn the right to influence an online system through measurable progress against a safe baseline. The same pattern can guide scheduling, admission control, resource allocation, and other online systems where predictions are useful but failure cannot be unbounded.</p>
+
+      <section class="article-related"><h2>Research trajectory</h2><div class="article-related-links"><a href="https://proceedings.neurips.cc/paper_files/paper/2024/hash/cd96cb9a239c37b39dbf34f3f5a4c56f-Abstract-Conference.html" target="_blank" rel="noopener">PFSUM: learning-augmented Bahncard problem &#8599;</a><a href="https://neurips.cc/virtual/2025/loc/san-diego/poster/116615" target="_blank" rel="noopener">Guard: robust learning-augmented caching &#8599;</a></div></section>
+    </article>
+  </main>
+
+  <footer class="site-footer"><div class="container footer-inner"><span>&copy; 2026 Hailiang Zhao &middot; Zhejiang University</span><span><a href="/index.html">Home</a></span></div></footer>
+</body>
+</html>

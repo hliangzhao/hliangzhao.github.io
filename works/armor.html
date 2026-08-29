@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="A technical guide to ARMOR, a robust self-supervised framework for microservice diagnosis under missing observability modalities.">
+  <title>ARMOR | Hailiang Zhao</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Source+Serif+4:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css?v=20260830">
+  <script src="/js/mathjax-config.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+<body>
+  <header class="site-header"><nav class="nav container" aria-label="Primary navigation"><a class="brand" href="/index.html"><span class="brand-mark">HZ</span> Hailiang Zhao</a><div class="nav-links"><a href="/index.html#contributions">Research</a><a href="/index.html#publications">Publications</a><a class="lang-link" href="/works/armor_zh.html" lang="zh-CN">中文</a></div></nav></header>
+
+  <main>
+    <section class="article-hero"><div class="article-shell">
+      <div class="article-kicker">ASE 2026 &middot; Agentic services and AIOps</div>
+      <h1>ARMOR</h1>
+      <p class="article-deck">A diagnostic system should not assume that its own observability infrastructure is always healthy.</p>
+      <p class="article-authors">Wenzhuo Qian, Hailiang Zhao, Ziqi Wang, Zhipeng Gao, Jiayi Chen, Zhiwei Ling, and Shuiguang Deng</p>
+      <div class="article-actions"><a class="button button-primary" href="https://arxiv.org/abs/2603.25538" target="_blank" rel="noopener">Paper &#8599;</a><a class="button button-secondary" href="https://zenodo.org/records/19157589" target="_blank" rel="noopener">Code and data &#8599;</a><a class="button button-secondary" href="/index.html#publications">Back to publications</a></div>
+    </div></section>
+
+    <article class="article-main article-shell article-body">
+      <p class="article-lead">ARMOR treats missing metrics, logs, and traces as a normal production condition rather than an afterthought. It learns each modality according to its physical structure, explicitly marks absent telemetry, suppresses misleading placeholders during fusion, and trains a shared diagnostic representation through self-supervised reconstruction.</p>
+
+      <div class="article-summary">
+        <article><strong>Asymmetric encoding</strong><span>Dense metrics and sparse event streams receive different model capacity.</span></article>
+        <article><strong>Missing-aware routing</strong><span>Placeholders identify absence; learned negative biases limit its influence.</span></article>
+        <article><strong>Unified diagnosis</strong><span>One representation supports detection, triage, and root-cause ranking.</span></article>
+      </div>
+
+      <h2>1. The hidden failure in AIOps</h2>
+      <p>Microservice diagnosis commonly combines three telemetry modalities: continuous resource and service metrics, semi-structured logs, and distributed traces. Most multimodal systems assume all three are present. In production, the monitoring agent can crash, the network can block exporters, sampling can discard traces, or a configuration error can silence a channel.</p>
+      <p>Zero filling is not neutral. A missing metric filled with zero can resemble an idle, healthy service. A downstream model may interpret this <em>pseudo-normal signal</em> with high confidence. Early or rigid fusion then lets one missing modality corrupt the useful evidence in the two modalities that survived.</p>
+
+      <h2>2. Formalizing incomplete observability</h2>
+      <p>For every service instance, ARMOR receives metrics \(X^{M}\), logs \(X^{L}\), and traces \(X^{T}\). An observation mask records which streams are actually available:</p>
+      <div class="math-block"><div class="math-caption">Observation state and diagnostic mapping</div>
+        \[
+          O=[o^{M},o^{L},o^{T}]\in\{0,1\}^{3},
+          \qquad
+          F_{\theta}:(\widetilde X,O)\mapsto(y,s,P).
+        \]
+        <p>The outputs are anomaly status \(y\), failure type \(s\), and a root-cause probability distribution \(P=[p_1,\ldots,p_N]\) over service instances. Supplying \(O\) explicitly lets the model distinguish missing data from a genuine numerical zero.</p>
+      </div>
+
+      <figure class="web-figure">
+        <div class="web-figure-title">ARMOR's end-to-end diagnostic path</div>
+        <div class="mechanism-flow" aria-label="ARMOR workflow">
+          <div class="flow-step"><strong>Three streams</strong>Align metrics, log-event counts, and trace statistics in time.</div>
+          <div class="flow-step flow-step-accent"><strong>Asymmetric encoder</strong>Learn each modality independently with capacity matched to its structure.</div>
+          <div class="flow-step"><strong>Missing-aware gate</strong>Insert learned absence tokens and reduce unreliable routing weights.</div>
+          <div class="flow-step flow-step-accent"><strong>Topology propagation</strong>Use graph attention to exchange evidence along service dependencies.</div>
+          <div class="flow-step"><strong>Three tasks</strong>Detect anomalies, classify failure type, and rank root-cause instances.</div>
+        </div>
+        <figcaption>The diagram is redrawn with web-native elements. The central distinction is between learning within each modality and routing information across modalities.</figcaption>
+      </figure>
+
+      <h2>3. Mechanism I: modality-specific status learning</h2>
+      <p>Metrics are dense, continuous, and often high-dimensional; logs and traces are sparse event summaries. A symmetric encoder can overfit sparse events or underfit volatile metrics. ARMOR therefore assigns deeper, high-capacity temporal blocks to metrics and lightweight blocks to logs and traces.</p>
+      <p>Within each modality \(m\), feature extraction is hierarchical:</p>
+      <div class="math-block">
+        \[
+          H_{m,\mathrm{temp}}=\operatorname{DepthwiseConv}(X_m),
+        \]
+        \[
+          H_{m,\mathrm{chan}}=\operatorname{PointwiseConv}_{\mathrm{chan}}(H_{m,\mathrm{temp}}),
+        \]
+        \[
+          H_m=\operatorname{PointwiseConv}_{\mathrm{inst}}(\operatorname{Permute}(H_{m,\mathrm{chan}})).
+        \]
+      </div>
+      <p>Large-kernel depthwise convolution captures long-term temporal effects such as a memory leak. Channel mixing captures relationships such as simultaneous latency and I/O spikes. Instance mixing begins to expose spatial correlations while keeping modality semantics separate.</p>
+
+      <h2>4. Mechanism II: missing-aware global fusion</h2>
+      <p>Each unimodal representation is projected to a common dimension. If modality \(k\) is absent, ARMOR does not pass a zero vector as if it were observed. It inserts a learned missing token \(E_{\mathrm{miss}}\), then adds a modality identity embedding:</p>
+      <div class="math-block">
+        \[
+          v'_k=o_kv_k+(1-o_k)E_{\mathrm{miss}}+E_{\mathrm{mod},k}.
+        \]
+      </div>
+      <p>Multi-head attention first models cross-modal interaction. A second gate decides how much each enriched token should contribute. Crucially, the missing bias is constrained to be negative:</p>
+      <div class="math-block"><div class="math-caption">Dynamic suppression of missing modalities</div>
+        \[
+          s_k=W_sU_k+(1-o_k)b_k^{\mathrm{miss}},
+          \qquad b_k^{\mathrm{miss}}&lt;0,
+        \]
+        \[
+          \alpha_k=\operatorname{softmax}(s_k),
+          \qquad E=\sum_{k\in\{M,L,T\}}\alpha_kU_k.
+        \]
+      </div>
+      <p>The placeholder says <em>what happened</em>: telemetry is absent. The negative bias controls <em>what the network should do</em>: redirect attention toward surviving evidence. The learned penalty is modality-specific, so a missing high-dimensional metric stream can be suppressed more strongly than a missing sparse stream.</p>
+      <p>ARMOR then propagates the fused instance representations through a multi-head graph attention network over the microservice invocation topology. Root-cause evidence can therefore move along actual service dependencies instead of being averaged across unrelated instances.</p>
+
+      <h2>5. Mechanism III: self-supervised operational learning</h2>
+      <p>During offline training, ARMOR uses anomaly-free telemetry and randomly drops entire modalities. From the remaining streams and neighboring services, it predicts the full next time step \(\widehat X^{(T+1)}\). Two reconstruction losses provide distinct supervision:</p>
+      <div class="math-block">
+        \[
+          \mathcal L_{\mathrm{obs}}
+          =\frac{1}{|O|}\left\|\bigl(\widehat X^{(T+1)}-X^{(T+1)}\bigr)\odot O\right\|_F^2,
+        \]
+        \[
+          \mathcal L_{\mathrm{miss}}
+          =\frac{1}{|1-O|}\left\|\bigl(\widehat X^{(T+1)}-X^{(T+1)}\bigr)\odot(1-O)\right\|_F^2,
+        \]
+        \[
+          \mathcal L=\mathcal L_{\mathrm{obs}}+\lambda\mathcal L_{\mathrm{miss}}.
+        \]
+      </div>
+      <p>The observed loss learns normal dynamics. The masked loss forces cross-modal and cross-instance inference, such as estimating CPU behavior from trace volume and neighboring services. At inference time, ARMOR concatenates reconstruction deviations with latent states to form a unified failure signature. Anomaly detection and root-cause localization remain label-free; failure triage uses failure-type labels for its downstream classifier.</p>
+
+      <h2>6. What the experiments demonstrate</h2>
+      <p>The paper evaluates two industry-standard microservice datasets and three levels of data failure: entire modalities, feature channels, and individual elements. Complete-data performance establishes that robustness is not obtained by sacrificing the normal operating case.</p>
+      <div class="table-scroll"><table class="technical-table">
+        <caption>ARMOR versus the strongest unified self-supervised baseline under complete telemetry</caption>
+        <thead><tr><th rowspan="2">Dataset</th><th rowspan="2">Method</th><th colspan="2">AD F1</th><th colspan="2">FT F1</th><th colspan="2">RCL Avg@5</th></tr><tr><th>Value</th><th>Absolute gain</th><th>Value</th><th>Absolute gain</th><th>Value</th><th>Absolute gain</th></tr></thead>
+        <tbody>
+          <tr><td>\(\mathcal D_1\)</td><td>ART</td><td>0.942</td><td></td><td>0.812</td><td></td><td>0.776</td><td></td></tr>
+          <tr class="highlight"><td>\(\mathcal D_1\)</td><td>ARMOR</td><td>0.961</td><td>+0.019</td><td>0.938</td><td>+0.126</td><td>0.910</td><td>+0.134</td></tr>
+          <tr><td>\(\mathcal D_2\)</td><td>ART</td><td>0.917</td><td></td><td>0.802</td><td></td><td>0.870</td><td></td></tr>
+          <tr class="highlight"><td>\(\mathcal D_2\)</td><td>ARMOR</td><td>0.997</td><td>+0.080</td><td>0.869</td><td>+0.067</td><td>0.893</td><td>+0.023</td></tr>
+        </tbody>
+      </table></div>
+      <p>When modalities are removed completely, ARMOR outperforms ART in every tested scenario on both datasets. The largest failure occurs when metrics are absent, because a dense metric placeholder creates the strongest pseudo-normal disturbance. In this setting, ARMOR retains more than 60% higher root-cause localization accuracy than ART across both datasets.</p>
+      <p>The finer-grained study increases modality, channel, and element missingness from 0% to 40%, repeating every point with ten random masks. ARMOR remains stronger across all three tasks, both datasets, and all three corruption granularities. This shows that the mechanism generalizes beyond the whole-stream failures used for training.</p>
+      <div class="result-strip">
+        <article><strong>0.961 / 0.997</strong><span>AD F1 on \(\mathcal D_1\) and \(\mathcal D_2\) with complete telemetry.</span></article>
+        <article><strong>0.938 / 0.869</strong><span>FT F1 across the two datasets, exceeding ART in both cases.</span></article>
+        <article><strong>&gt;60%</strong><span>RCL accuracy advantage over ART when the metric modality is absent.</span></article>
+      </div>
+      <p>Ablations provide mechanism-level evidence. Replacing missing-aware gating with mean fusion, replacing the learned placeholder with zeros, or removing modality-dropout training all reduces performance. Removing or replacing graph attention mainly hurts localization, matching the intended role of service topology.</p>
+
+      <h2>7. Scope and open questions</h2>
+      <p>ARMOR assumes that offline archives are sufficiently complete to provide reconstruction targets for synthetically masked channels. Persistently absent historical modalities would weaken that signal. It also uses a topology constructed from historical traces, so rapid service creation and removal require updates. Cross-instance contrastive objectives and incremental graph learning are natural next steps.</p>
+      <p>ARMOR is not itself an autonomous agent. It contributes the dependable operational layer that agentic services will need: telemetry-aware representation, diagnosis under infrastructure failure, and explicit uncertainty about missing evidence.</p>
+
+      <section class="article-related"><h2>Related direction</h2><div class="article-related-links"><a href="https://arxiv.org/abs/2509.24380" target="_blank" rel="noopener">Agentic Services Computing &#8599;</a><a href="/index.html#contributions">Agentic services research</a></div></section>
+    </article>
+  </main>
+
+  <footer class="site-footer"><div class="container footer-inner"><span>&copy; 2026 Hailiang Zhao &middot; Zhejiang University</span><span><a href="/index.html">Home</a></span></div></footer>
+</body>
+</html>

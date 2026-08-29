@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="ARMOR 论文技术解读：面向观测模态缺失的鲁棒自监督微服务故障管理。">
+  <title>ARMOR 论文解读 | 赵海亮</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700&amp;family=Source+Serif+4:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css?v=20260830">
+  <script src="/js/mathjax-config.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+<body>
+  <header class="site-header"><nav class="nav container" aria-label="主导航"><a class="brand" href="/index_zh.html"><span class="brand-mark">HZ</span> 赵海亮</a><div class="nav-links"><a href="/index_zh.html#contributions">研究工作</a><a href="/index_zh.html#publications">代表论文</a><a class="lang-link" href="/works/armor.html" lang="en">English</a></div></nav></header>
+
+  <main>
+    <section class="article-hero"><div class="article-shell">
+      <div class="article-kicker">ASE 2026 &middot; 智能体服务与智能运维</div>
+      <h1>ARMOR</h1>
+      <p class="article-deck">故障诊断系统不能假设，负责观测它的基础设施永远正常。</p>
+      <p class="article-authors">Wenzhuo Qian, Hailiang Zhao, Ziqi Wang, Zhipeng Gao, Jiayi Chen, Zhiwei Ling, and Shuiguang Deng</p>
+      <div class="article-actions"><a class="button button-primary" href="https://arxiv.org/abs/2603.25538" target="_blank" rel="noopener">论文 &#8599;</a><a class="button button-secondary" href="https://zenodo.org/records/19157589" target="_blank" rel="noopener">代码与数据 &#8599;</a><a class="button button-secondary" href="/index_zh.html#publications">返回代表论文</a></div>
+    </div></section>
+
+    <article class="article-main article-shell article-body">
+      <p class="article-lead">ARMOR 不把指标、日志或调用链缺失当作边缘情况，而是将其视为生产环境中的基本条件。它按不同遥测数据的物理结构分别学习表示，显式标记缺失输入，在融合时抑制误导性的占位信息，并通过自监督重构训练一套共享故障表示。</p>
+
+      <div class="article-summary">
+        <article><strong>非对称编码</strong><span>为稠密指标和稀疏事件流分配不同的模型容量。</span></article>
+        <article><strong>缺失感知路由</strong><span>占位表示标识缺失，负向偏置限制其影响。</span></article>
+        <article><strong>统一故障诊断</strong><span>一套表示支撑异常检测、故障分类与根因排序。</span></article>
+      </div>
+
+      <h2>1. 智能运维中容易被忽略的故障</h2>
+      <p>微服务故障诊断通常结合三类遥测数据：连续的资源与服务指标、半结构化日志、分布式调用链。多数多模态系统默认三者始终齐全。真实环境中，采集代理可能崩溃，网络可能阻断 exporter，采样会丢弃调用链，配置错误也会让通道停止上报。</p>
+      <p>用零补齐并不是中性操作。一个缺失指标被填成零，可能恰好像服务处于健康空闲状态，模型反而会高置信地读出一条“伪正常信号”。如果过早或僵硬地融合多类数据，一个缺失模态还会污染另外两个尚且有效的模态。</p>
+
+      <h2>2. 如何形式化不完整观测</h2>
+      <p>对每个服务实例，ARMOR 接收指标 \(X^{M}\)、日志 \(X^{L}\) 与调用链 \(X^{T}\)。观测掩码记录哪些数据流实际可用：</p>
+      <div class="math-block"><div class="math-caption">观测状态与诊断映射</div>
+        \[
+          O=[o^{M},o^{L},o^{T}]\in\{0,1\}^{3},
+          \qquad
+          F_{\theta}:(\widetilde X,O)\mapsto(y,s,P).
+        \]
+        <p>输出分别是异常状态 \(y\)、故障类型 \(s\)，以及服务实例上的根因概率分布 \(P=[p_1,\ldots,p_N]\)。显式输入 \(O\)，模型才能区分“没有采到数据”和“真实数值为零”。</p>
+      </div>
+
+      <figure class="web-figure">
+        <div class="web-figure-title">ARMOR 端到端故障诊断流程</div>
+        <div class="mechanism-flow" aria-label="ARMOR 工作流程">
+          <div class="flow-step"><strong>三类数据流</strong>按时间对齐指标、日志事件计数与调用链统计。</div>
+          <div class="flow-step flow-step-accent"><strong>非对称编码器</strong>各模态独立学习，模型容量与数据结构相匹配。</div>
+          <div class="flow-step"><strong>缺失感知门控</strong>注入缺失标记，并降低不可靠输入的路由权重。</div>
+          <div class="flow-step flow-step-accent"><strong>拓扑传播</strong>沿服务依赖关系，用图注意力交换故障证据。</div>
+          <div class="flow-step"><strong>三个任务</strong>检测异常、判断故障类型、排序根因实例。</div>
+        </div>
+        <figcaption>该图由网页原生元素重绘。核心区别在于：先在模态内部学习，再在模态之间谨慎路由。</figcaption>
+      </figure>
+
+      <h2>3. 机制一：模态专用状态学习</h2>
+      <p>指标稠密、连续且通常维度较高，日志和调用链则是稀疏事件摘要。完全对称的编码器可能对稀疏事件过拟合，也可能无法充分表达波动复杂的指标。ARMOR 因此给指标分配更深、容量更高的时序模块，日志与调用链采用轻量模块。</p>
+      <p>在每个模态 \(m\) 内，特征提取分为三个层次：</p>
+      <div class="math-block">
+        \[
+          H_{m,\mathrm{temp}}=\operatorname{DepthwiseConv}(X_m),
+        \]
+        \[
+          H_{m,\mathrm{chan}}=\operatorname{PointwiseConv}_{\mathrm{chan}}(H_{m,\mathrm{temp}}),
+        \]
+        \[
+          H_m=\operatorname{PointwiseConv}_{\mathrm{inst}}(\operatorname{Permute}(H_{m,\mathrm{chan}})).
+        \]
+      </div>
+      <p>大卷积核的深度卷积捕捉内存泄漏等长期时序变化，通道混合表达延迟与 I/O 同时升高等关联，实例混合则初步建立空间关系，同时避免不同模态过早互相干扰。</p>
+
+      <h2>4. 机制二：缺失感知全局融合</h2>
+      <p>各模态表示先被投影到统一维度。若模态 \(k\) 缺失，ARMOR 不会把零向量伪装成正常观测，而是放入可学习的缺失标记 \(E_{\mathrm{miss}}\)，再加入模态身份向量：</p>
+      <div class="math-block">
+        \[
+          v'_k=o_kv_k+(1-o_k)E_{\mathrm{miss}}+E_{\mathrm{mod},k}.
+        \]
+      </div>
+      <p>多头注意力先建模模态间关系，随后第二层门控决定每个模态应贡献多少。关键约束是，缺失偏置必须为负：</p>
+      <div class="math-block"><div class="math-caption">动态抑制缺失模态</div>
+        \[
+          s_k=W_sU_k+(1-o_k)b_k^{\mathrm{miss}},
+          \qquad b_k^{\mathrm{miss}}&lt;0,
+        \]
+        \[
+          \alpha_k=\operatorname{softmax}(s_k),
+          \qquad E=\sum_{k\in\{M,L,T\}}\alpha_kU_k.
+        \]
+      </div>
+      <p>占位表示回答“发生了什么”：遥测缺失；负向偏置回答“模型应如何处理”：把注意力转向仍然可靠的证据。惩罚按模态分别学习，因此高维指标缺失时，可以比稀疏事件流缺失受到更强抑制。</p>
+      <p>最后，ARMOR 在微服务调用拓扑上运行多头图注意力网络。根因证据可以沿真实依赖关系传播，而不是在互不相关的服务实例间简单平均。</p>
+
+      <h2>5. 机制三：自监督学习正常运行规律</h2>
+      <p>离线训练只使用无异常遥测，并随机丢弃整类模态。模型根据剩余数据流和相邻服务，预测完整的下一时刻 \(\widehat X^{(T+1)}\)。两个重构损失提供不同监督：</p>
+      <div class="math-block">
+        \[
+          \mathcal L_{\mathrm{obs}}
+          =\frac{1}{|O|}\left\|\bigl(\widehat X^{(T+1)}-X^{(T+1)}\bigr)\odot O\right\|_F^2,
+        \]
+        \[
+          \mathcal L_{\mathrm{miss}}
+          =\frac{1}{|1-O|}\left\|\bigl(\widehat X^{(T+1)}-X^{(T+1)}\bigr)\odot(1-O)\right\|_F^2,
+        \]
+        \[
+          \mathcal L=\mathcal L_{\mathrm{obs}}+\lambda\mathcal L_{\mathrm{miss}}.
+        \]
+      </div>
+      <p>观测损失用于学习正常运行规律，掩码损失迫使模型完成跨模态、跨实例推断，例如根据调用量和相邻服务估计 CPU 状态。在线阶段，ARMOR 将重构偏差与潜在状态拼接为统一故障表征。异常检测与根因定位不需要故障标签，故障分类的下游分类器使用故障类型标签。</p>
+
+      <h2>6. 实验证明了什么</h2>
+      <p>论文使用两个业界常用微服务数据集，并设置三种缺失粒度：整类模态、特征通道和单个元素。完整数据实验首先确认，鲁棒性并不是以牺牲正常场景性能换来的。</p>
+      <div class="table-scroll"><table class="technical-table">
+        <caption>完整遥测条件下，ARMOR 与最强统一自监督基线的比较</caption>
+        <thead><tr><th rowspan="2">数据集</th><th rowspan="2">方法</th><th colspan="2">AD F1</th><th colspan="2">FT F1</th><th colspan="2">RCL Avg@5</th></tr><tr><th>数值</th><th>绝对差值</th><th>数值</th><th>绝对差值</th><th>数值</th><th>绝对差值</th></tr></thead>
+        <tbody>
+          <tr><td>\(\mathcal D_1\)</td><td>ART</td><td>0.942</td><td></td><td>0.812</td><td></td><td>0.776</td><td></td></tr>
+          <tr class="highlight"><td>\(\mathcal D_1\)</td><td>ARMOR</td><td>0.961</td><td>+0.019</td><td>0.938</td><td>+0.126</td><td>0.910</td><td>+0.134</td></tr>
+          <tr><td>\(\mathcal D_2\)</td><td>ART</td><td>0.917</td><td></td><td>0.802</td><td></td><td>0.870</td><td></td></tr>
+          <tr class="highlight"><td>\(\mathcal D_2\)</td><td>ARMOR</td><td>0.997</td><td>+0.080</td><td>0.869</td><td>+0.067</td><td>0.893</td><td>+0.023</td></tr>
+        </tbody>
+      </table></div>
+      <p>整类模态缺失时，ARMOR 在两个数据集的所有场景下都优于 ART。指标缺失造成的冲击最大，因为高维指标占位会产生最强的伪正常干扰。在这一场景下，ARMOR 的根因定位准确率在两个数据集上均比 ART 高出 60% 以上。</p>
+      <p>更细粒度的实验把模态、通道和元素缺失率从 0% 提高到 40%，每个点使用十组随机掩码重复测试。ARMOR 在三个任务、两个数据集、三类缺失粒度下都保持更强表现，说明该机制不仅能处理训练时模拟的整类缺失，也能应对间歇性和局部数据损坏。</p>
+      <div class="result-strip">
+        <article><strong>0.961 / 0.997</strong><span>完整遥测下，\(\mathcal D_1\) 与 \(\mathcal D_2\) 上的异常检测 F1。</span></article>
+        <article><strong>0.938 / 0.869</strong><span>两个数据集上的故障分类 F1，均超过 ART。</span></article>
+        <article><strong>&gt;60%</strong><span>指标模态缺失时，相对 ART 的根因定位准确率优势。</span></article>
+      </div>
+      <p>消融实验也与机制设计一致。把缺失感知门控换成均值融合、把可学习占位换成零填充、或者取消模态丢弃训练，都会降低性能；去掉或替换图注意力主要影响根因定位，符合服务拓扑模块的预期作用。</p>
+
+      <h2>7. 适用边界与后续问题</h2>
+      <p>ARMOR 假设离线历史档案足够完整，能够为人工掩码通道提供重构目标。如果某个模态在历史数据中长期缺失，这一训练信号会减弱。当前服务拓扑也来自历史调用链，若实例频繁创建与销毁，需要及时更新。跨实例对比学习与增量图学习是自然的后续方向。</p>
+      <p>ARMOR 本身不是自主智能体。它提供的是智能体服务所需的可靠运行底座：理解遥测结构，在观测基础设施失效时继续诊断，并显式区分缺失证据与正常数值。</p>
+
+      <section class="article-related"><h2>相关方向</h2><div class="article-related-links"><a href="https://arxiv.org/abs/2509.24380" target="_blank" rel="noopener">Agentic Services Computing &#8599;</a><a href="/index_zh.html#contributions">智能体服务研究</a></div></section>
+    </article>
+  </main>
+
+  <footer class="site-footer"><div class="container footer-inner"><span>&copy; 2026 赵海亮 &middot; 浙江大学</span><span><a href="/index_zh.html">主页</a></span></div></footer>
+</body>
+</html>

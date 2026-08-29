@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="A technical guide to SegQuant, a semantics-aware and deployable quantization framework for diffusion models.">
+  <title>SegQuant | Hailiang Zhao</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Source+Serif+4:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css?v=20260830">
+  <script src="/js/mathjax-config.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+<body>
+  <header class="site-header"><nav class="nav container" aria-label="Primary navigation"><a class="brand" href="/index.html"><span class="brand-mark">HZ</span> Hailiang Zhao</a><div class="nav-links"><a href="/index.html#contributions">Research</a><a href="/index.html#publications">Publications</a><a class="lang-link" href="/works/segquant_zh.html" lang="zh-CN">中文</a></div></nav></header>
+
+  <main>
+    <section class="article-hero"><div class="article-shell">
+      <div class="article-kicker">CVPR 2026 &middot; Generative AI systems</div>
+      <h1>SegQuant</h1>
+      <p class="article-deck">Quantize the computation that a tensor represents, not just the numbers stored in that tensor.</p>
+      <p class="article-authors">Jiaji Zhang, Ruichao Sun, Hailiang Zhao, Jiaju Wu, Peng Chen, Hao Li, Yuying Liu, Kingsum Chow, Gang Xiong, and Shuiguang Deng</p>
+      <div class="article-actions"><a class="button button-primary" href="https://arxiv.org/abs/2507.14811" target="_blank" rel="noopener">Paper &#8599;</a><a class="button button-secondary" href="https://optisys-zju.github.io/segquant/" target="_blank" rel="noopener">Project &#8599;</a><a class="button button-secondary" href="https://github.com/OptiSys-ZJU/segquant" target="_blank" rel="noopener">Code &#8599;</a></div>
+    </div></section>
+
+    <article class="article-main article-shell article-body">
+      <p class="article-lead">Most post-training quantization methods see a linear layer as one numerical matrix. SegQuant also asks where its inputs come from and where its outputs go. It derives semantic segments from the computation graph, quantizes those segments independently, and preserves polarity-asymmetric activations through a hardware-native dual-scale execution path.</p>
+
+      <div class="article-summary">
+        <article><strong>SegLinear</strong><span>Discovers semantic partitions through graph topology, without hand-written layer lists.</span></article>
+        <article><strong>DualScale</strong><span>Assigns separate resolution to negative and nonnegative activations.</span></article>
+        <article><strong>Deployment-aware</strong><span>Retains fixed-width integer GEMM, batching, and fused epilogues.</span></article>
+      </div>
+
+      <h2>1. Why ordinary tensor quantization is insufficient</h2>
+      <p>Diffusion models repeatedly apply the same denoising backbone, so a small per-layer error can propagate across many timesteps. DiT-style architectures add another difficulty: operations such as <code>chunk</code>, <code>split</code>, <code>concat</code>, and <code>reshape</code> reveal that one physical linear layer can carry several computational meanings.</p>
+      <p>For example, an AdaNorm linear layer emits shift, scale, and gate parameters for attention and MLP branches. Their numerical ranges and sensitivity differ. Using one quantization configuration for the entire fused matrix creates <em>segment interference</em>: a large-range segment determines the quantizer and wastes resolution needed by a smaller, more sensitive segment.</p>
+      <div class="math-block"><div class="math-caption">Conventional uniform view</div>
+        \[
+          Y=XW, \qquad \widehat{Y}=Q(X)Q(W).
+        \]
+        <p>This formula hides the graph semantics of \(X\) and \(W\). SegQuant recovers that structure before choosing quantization parameters.</p>
+      </div>
+
+      <h2>2. SegLinear: semantics from graph topology</h2>
+      <p>SegLinear uses <code>torch.fx</code> symbolic tracing and topological pattern matching. It looks around each linear operator for two reusable patterns, rather than relying on model names or manually curated layers.</p>
+
+      <h3>Output-segmented quantization</h3>
+      <p>If a linear output is later divided by <code>chunk</code> or <code>split</code>, the graph says that different output regions feed different branches. SegLinear partitions the output dimension and quantizes every submatrix independently:</p>
+      <div class="math-block">
+        \[
+          W=[W_1,W_2,\ldots,W_N], \qquad
+          \widehat{Y}=[\widehat{X}\widehat{W}_1,\widehat{X}\widehat{W}_2,\ldots,\widehat{X}\widehat{W}_N].
+        \]
+      </div>
+
+      <h3>Input-segmented quantization</h3>
+      <p>If the input is produced by <code>concat</code> or a structure-changing <code>reshape</code>, the input channels originate from distinct paths. SegLinear partitions both the input and the corresponding rows of the weight matrix:</p>
+      <div class="math-block">
+        \[
+          X=[X_1,X_2,\ldots,X_N], \qquad
+          W=[W_1^{\mathsf T},W_2^{\mathsf T},\ldots,W_N^{\mathsf T}]^{\mathsf T},
+        \]
+        \[
+          \widehat{Y}=\sum_{i=1}^{N}\widehat{X}_i\widehat{W}_i.
+        \]
+      </div>
+      <p>The segment widths are inferred directly from graph metadata. Each segment may then use SmoothQuant, GPTQ, SVDQuant, or another optimizer with its own calibration. SegLinear therefore separates structural discovery from numerical optimization.</p>
+
+      <figure class="web-figure">
+        <div class="web-figure-title">SegQuant's graph-to-kernel workflow</div>
+        <div class="mechanism-flow" aria-label="SegQuant workflow">
+          <div class="flow-step"><strong>Trace graph</strong>Build a static operator graph with tensor shapes and dependencies.</div>
+          <div class="flow-step flow-step-accent"><strong>Detect semantics</strong>Match concat-to-linear and linear-to-split patterns.</div>
+          <div class="flow-step"><strong>Segment tensors</strong>Partition the relevant input channels or weight regions.</div>
+          <div class="flow-step flow-step-accent"><strong>Optimize locally</strong>Calibrate and quantize each coherent segment independently.</div>
+          <div class="flow-step"><strong>Lower to kernels</strong>Execute fixed-width low-bit GEMM with fused reconstruction.</div>
+        </div>
+        <figcaption>The figure is rendered in HTML and CSS. It summarizes the implementation pipeline without relying on a rasterized paper screenshot.</figcaption>
+      </figure>
+
+      <h2>3. DualScale: preserve polarity without changing bit layout</h2>
+      <p>SiLU and GELU retain many small negative values while allowing a much wider positive range. A single uniform step size is dominated by positive outliers and compresses the negative interval into too few bins. Yet those negative activations carry high-frequency texture and detail in diffusion generation.</p>
+      <p>DualScale assigns one step size to the negative region and another to the nonnegative region:</p>
+      <div class="math-block"><div class="math-caption">Polarity-aware quantization</div>
+        \[
+          Q_{\mathrm{dual}}(x)=
+          \begin{cases}
+            \operatorname{round}(x/s_-), &amp; x&lt;0,\\
+            \operatorname{round}(x/s_+), &amp; x\geq0,
+          \end{cases}
+        \]
+        \[
+          s_-=\frac{|\min(X)|}{q_{\min}}, \qquad
+          s_+=\frac{\max(X)}{q_{\max}}.
+        \]
+      </div>
+      <p>Writing \(X_+=\max(X,0)\) and \(X_-=\min(X,0)\), the linear result is reconstructed as</p>
+      <div class="math-block">
+        \[
+          Y\approx (s_+s_w)\widehat{X}_+\widehat{W}+(s_-s_w)\widehat{X}_-\widehat{W}.
+        \]
+      </div>
+      <p>Although the equation has two products, the implementation submits them as one BatchedGEMM and combines the scaled outputs in a fused epilogue. It therefore uses standard fixed-width integer arithmetic and avoids custom number formats or additional kernel launches.</p>
+
+      <h2>4. Why the two mechanisms complement each other</h2>
+      <div class="technical-grid">
+        <article class="technical-card"><h3>SegLinear fixes structural interference</h3><p>It prevents one semantic branch from determining quantization parameters for another branch.</p></article>
+        <article class="technical-card"><h3>DualScale fixes polarity interference</h3><p>It prevents the wide positive range from erasing resolution in a narrow but meaningful negative range.</p></article>
+        <article class="technical-card"><h3>Optimizer-agnostic</h3><p>Both mechanisms wrap existing PTQ optimizers instead of replacing them with a model-specific method.</p></article>
+        <article class="technical-card"><h3>Compiler-compatible</h3><p>Static graph detection and ordinary low-bit GEMM fit current deployment toolchains.</p></article>
+      </div>
+
+      <h2>5. Experimental evidence</h2>
+      <p>The study covers SD3.5, FLUX.1-dev, and SDXL; DiT and UNet backbones; INT8 and INT4 configurations; and COCO, MJHQ-30K, and DCI image sets. The ablation below isolates the two proposed components on SD3.5 with W8A8 quantization.</p>
+      <div class="table-scroll"><table class="technical-table">
+        <caption>Ablation on MJHQ-30K, SD3.5 W8A8</caption>
+        <thead><tr><th>Method</th><th>FID ↓</th><th>Image Reward ↑</th><th>LPIPS ↓</th><th>PSNR ↑</th><th>SSIM ↑</th></tr></thead>
+        <tbody>
+          <tr><td>Baseline</td><td>23.35</td><td>0.877</td><td>0.419</td><td>11.93</td><td>0.536</td></tr>
+          <tr><td>+ SegLinear</td><td>23.36</td><td>0.899</td><td>0.395</td><td>12.03</td><td>0.554</td></tr>
+          <tr><td>+ DualScale</td><td>22.61</td><td>0.909</td><td>0.401</td><td>12.14</td><td>0.551</td></tr>
+          <tr class="highlight"><td>+ SegLinear + DualScale</td><td>22.54</td><td>0.952</td><td>0.377</td><td>12.50</td><td>0.567</td></tr>
+        </tbody>
+      </table></div>
+      <p>Layer-level measurements explain the gain. With GPTQ, the Frobenius quantization error of <code>DiT.11.norm1 context</code> falls from \(3.0176\) to \(1.7637\) after semantic segmentation. The improvement appears across SmoothQuant, SVDQuant, and GPTQ, indicating that the graph partition, rather than one optimizer, is the source of the effect.</p>
+
+      <div class="table-scroll"><table class="technical-table">
+        <caption>Deployment cost on SD3.5, RTX 4090</caption>
+        <thead><tr><th>Configuration</th><th>Peak memory (GiB)</th><th>Backbone size (GiB)</th><th>Per-step latency (ms)</th></tr></thead>
+        <tbody>
+          <tr><td>FP16</td><td>18.63</td><td>3.88</td><td>317.18</td></tr>
+          <tr><td>INT8 baseline</td><td>16.73</td><td>2.00</td><td>278.86</td></tr>
+          <tr class="highlight"><td>SegQuant-8</td><td>16.72</td><td>2.02</td><td>287.85</td></tr>
+          <tr><td>INT4 baseline</td><td>16.06</td><td>1.29</td><td>209.78</td></tr>
+          <tr class="highlight"><td>SegQuant-4</td><td>16.12</td><td>1.42</td><td>212.87</td></tr>
+        </tbody>
+      </table></div>
+      <div class="result-strip">
+        <article><strong>22.54 FID</strong><span>Full method versus 23.35 for the W8A8 ablation baseline.</span></article>
+        <article><strong>0.952 IR</strong><span>Image Reward rises from 0.877 when both components are enabled.</span></article>
+        <article><strong>1.5% W4 overhead</strong><span>SegQuant-4 adds 3.09 ms per step over the INT4 baseline while preserving its main efficiency gain.</span></article>
+      </div>
+      <div class="article-note"><strong>How to read the results.</strong> SegQuant does not claim that semantic handling is free. It adds a small runtime and scale-storage cost. The systems contribution is that this cost stays close to ordinary INT8 or INT4 execution while the quality metrics improve consistently.</div>
+
+      <h2>6. Broader research direction</h2>
+      <p>SegQuant treats model structure as deployment information. Shiva-DiT continues the broader agenda from a different angle by learning which transformer computations should be retained through residual-based differentiable top-k selection. Both works seek structure-aware efficiency instead of applying the same approximation to every parameter, activation, or token.</p>
+
+      <section class="article-related"><h2>Related work</h2><div class="article-related-links"><a href="https://arxiv.org/abs/2602.05605" target="_blank" rel="noopener">Shiva-DiT: differentiable top-k selection &#8599;</a><a href="/index.html#contributions">Generative AI systems research</a></div></section>
+    </article>
+  </main>
+
+  <footer class="site-footer"><div class="container footer-inner"><span>&copy; 2026 Hailiang Zhao &middot; Zhejiang University</span><span><a href="/index.html">Home</a></span></div></footer>
+</body>
+</html>

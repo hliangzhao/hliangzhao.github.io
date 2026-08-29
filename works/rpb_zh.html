@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="RPB 论文技术解读：在学习增强分页问题中逼近最优鲁棒性。">
+  <title>RPB 论文解读 | 赵海亮</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700&amp;family=Source+Serif+4:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css?v=20260830">
+  <script src="/js/mathjax-config.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+<body>
+  <header class="site-header"><nav class="nav container" aria-label="主导航">
+    <a class="brand" href="/index_zh.html"><span class="brand-mark">HZ</span> 赵海亮</a>
+    <div class="nav-links"><a href="/index_zh.html#contributions">研究工作</a><a href="/index_zh.html#publications">代表论文</a><a class="lang-link" href="/works/rpb.html" lang="en">English</a></div>
+  </nav></header>
+
+  <main>
+    <section class="article-hero"><div class="article-shell">
+      <div class="article-kicker">ICML 2026 Spotlight &middot; 学习增强在线算法</div>
+      <h1>Towards Optimal Robustness in Learning-Augmented Paging</h1>
+      <p class="article-deck">既充分利用准确预测，又不让错误预测破坏最坏情况保证，在线分页算法能否兼得两者？</p>
+      <p class="article-authors">Peng Chen, Hailiang Zhao, Xueyan Tang, Yixuan Wang, and Shuiguang Deng</p>
+      <div class="article-actions"><a class="button button-primary" href="https://arxiv.org/pdf/2606.01342" target="_blank" rel="noopener">论文 &#8599;</a><a class="button button-secondary" href="https://github.com/Natureal/ICML-Cache-Coliseum" target="_blank" rel="noopener">代码 &#8599;</a><a class="button button-secondary" href="/index_zh.html#publications">返回代表论文</a></div>
+    </div></section>
+
+    <article class="article-main article-shell article-body">
+      <p class="article-lead">RPB 将“对预测的信任”变成一项需要记账的资源。只有相对于最优鲁棒在线基线积累了足够预算，算法才允许预测改变淘汰决策。由此，完美预测可以带来离线最优性能，任意错误预测也不会导致失控的最坏情况代价。</p>
+
+      <div class="article-summary">
+        <article><strong>1-consistency</strong><span>下一次到达时间预测完全准确时，达到离线最优。</span></article>
+        <article><strong>\(H_k+O(1)\) 鲁棒性</strong><span>最坏竞争比达到最优量级，仅相差加性常数。</span></article>
+        <article><strong>对数平滑性</strong><span>性能随归一化预测误差逐步退化，而非突然失效。</span></article>
+      </div>
+
+      <h2>1. 问题是什么</h2>
+      <p>缓存最多容纳 \(k\) 个页面，请求序列 \(\sigma=\langle p_1,\ldots,p_n\rangle\) 在线到达。每次缺页产生单位代价，并可能需要淘汰一个已有页面。Belady 策略会淘汰未来最晚再次访问的页面，但它必须预知完整请求序列。</p>
+      <div class="math-block"><div class="math-caption">竞争性能</div>
+        \[
+          \operatorname{cost}(A,\sigma)
+          \leq \alpha\,\operatorname{cost}(\mathrm{OPT},\sigma)+c.
+        \]
+        <p>经典随机分页算法能够达到最优竞争比 \(H_k=\sum_{i=1}^{k}1/i\)。学习增强算法的目标，是在预测准确时靠近 OPT，在预测错误时仍保留同等级别的上界。</p>
+      </div>
+
+      <h3>需要同时回答三个问题</h3>
+      <div class="technical-grid">
+        <article class="technical-card"><h3>一致性</h3><p>预测完全准确时，竞争比应尽可能小。RPB-OM 达到 \(1\)，也就是离线最优。</p></article>
+        <article class="technical-card"><h3>鲁棒性</h3><p>预测任意错误时，代价仍需被可靠在线算法约束。RPB-OM 达到 \(H_k+O(1)\)。</p></article>
+        <article class="technical-card"><h3>平滑性</h3><p>当误差为 \(\eta_1\) 时，性能应逐步变差。RPB-OM 达到 \(O(1+\log(\eta_1/\operatorname{cost}(\mathrm{OPT})))\)。</p></article>
+        <article class="technical-card"><h3>根本矛盾</h3><p>预测淘汰可以改善一致性，也可能让缓存偏离鲁棒基线。算法必须为这种偏离付出可分析的代价。</p></article>
+      </div>
+
+      <h2>2. 以往的信任规则为什么仍有缺口</h2>
+      <p>已有方法也会限制预测的使用，但记账方式较粗。全局切换只看累计代价，可能错过局部仍然可靠的预测；固定长度的淘汰链阈值，则可能在误差较大时过度信任预测，在误差较小时又过早停用预测。</p>
+      <ol class="principle-list">
+        <li><span class="term">预测质量具有局部性。</span> 同一预测器可能在一段淘汰链上很准确，在下一段突然失效，仅靠全局分数无法表达这种变化。</li>
+        <li><span class="term">信任必须有参照物。</span> 有意义的参照不是经过了多少时间，而是可靠基线在相同状态下取得了多少进展。</li>
+        <li><span class="term">偏离基线必须付费。</span> 预测决策会扩大两个缓存状态之间的差异，因此需要消耗一种能进入理论分析的资源。</li>
+      </ol>
+
+      <h2>3. 相对预测预算</h2>
+      <p>RPB 建立在 ONOPT 之上。ONOPT 利用工作函数的分层结构，始终维护一个有效缓存配置。其高效实例 OnlineMin（OM）与最优竞争随机算法保持相同的配置分布，每次请求只需 \(O(\log k)\) 的更新时间。</p>
+      <p>算法维护一个非负预算 \(B\)。请求落入零层 \(L_0\) 时，意味着当前不确定性最大。此时若发生缺页，RPB 按预测执行淘汰，并将 \(B\) 重置为常数 \(\tau\)。之后遇到惰性对手请求时，算法比较此前预测淘汰与 OM 基线的实际进展，再判断是否赚到新的预算。</p>
+
+      <figure class="web-figure">
+        <div class="web-figure-title">一次 RPB-OM 决策循环</div>
+        <div class="mechanism-flow" aria-label="RPB-OM 决策流程">
+          <div class="flow-step"><strong>请求到达</strong>确定其工作函数层，并构造 OM 候选集。</div>
+          <div class="flow-step flow-step-accent"><strong>\(L_0\) 缺页</strong>按预测的下一次到达顺序淘汰，并令 \(B\leftarrow\tau\)。</div>
+          <div class="flow-step"><strong>衡量进展</strong>记录上次缺页后未揭示层数 \(U(\omega)\) 的变化。</div>
+          <div class="flow-step"><strong>预算门控</strong><span>仅当<br><span class="flow-formula">\(U(\omega)\leq\)<br>\((Y+2)/e-2\)</span><br>时赚取一个单位。</span></div>
+          <div class="flow-step flow-step-accent"><strong>选择淘汰</strong>若 \(B&gt;0\)，采用预测并消耗一点预算；否则跟随 OM。</div>
+        </div>
+        <figcaption>这里的预算不是预测器给出的置信度，而是算法在线观察到的证据：近期预测淘汰相对于鲁棒基线确实有效。</figcaption>
+      </figure>
+
+      <h3>为什么用未揭示层数做门控</h3>
+      <p>令 \(U(\omega)=k-|R(\omega)|\) 表示未揭示的工作函数层数。惰性请求逐步揭示这些层时，OM 的势函数至少按调和量下降。门控条件据此判断，基线是否已经积累足够进展，从而为下一次预测偏离付费。算法无需显式模拟 OM 的完整缓存分布，就能把预测有效性与鲁棒性精细关联起来。</p>
+
+      <h2>4. 证明为什么成立</h2>
+      <p>证明没有单独估算预测淘汰的代价，而是把三部分放进同一个势函数：</p>
+      <div class="math-block"><div class="math-caption">RPB-OM 的势函数</div>
+        \[
+          \Phi(\omega)=\phi(\omega)+D(\omega)+B(\omega).
+        \]
+        <p>其中 \(\phi\) 是 OM 面对后续惰性对手时的期望代价，\(D\) 是 RPB-OM 与 OM 的期望缓存差异，\(B\) 是尚未花费的预测预算。</p>
+      </div>
+      <p>在 \(L_0\) 缺页时，算法可能同时增加缓存差异与预算，但相对于 OM 的 \(H_k-1\) 势函数变化，只多出 \(O(1)\)。后续惰性请求中，预测缺页会消耗预算，跟随 OM 的缺页则会缩小缓存差异，两种情况的摊还代价都不为正。将这些不等式累加，便得到最坏情况结论。</p>
+      <div class="article-note"><strong>“接近最优”具体指什么？</strong> 若要求严格的 \(H_k\) 鲁棒性，算法必须完全跟随经典最优在线算法，无法真正使用预测。RPB-OM 达到 \(H_k+O(1)\)，对使用预测的算法而言，仅留下一个加性常数。</div>
+
+      <h2>5. 实验回答了什么</h2>
+      <p>论文在 SPEC CPU 2006 内存轨迹上同时使用合成对数正态噪声，以及 PLECO、POPU 两个真实预测器。下表为论文报告的平均结果，代价比越低越好，命中率越高越好。</p>
+      <div class="table-scroll"><table class="technical-table">
+        <caption>真实下一次到达预测器上的平均结果</caption>
+        <thead><tr><th rowspan="2">方法</th><th colspan="2">PLECO</th><th colspan="2">POPU</th></tr><tr><th>代价比</th><th>命中率</th><th>代价比</th><th>命中率</th></tr></thead>
+        <tbody>
+          <tr><td>BlindOracle</td><td>1.404</td><td>15.92</td><td>1.261</td><td>21.75</td></tr>
+          <tr><td>BlindOracle &amp; LRU</td><td>1.286</td><td>20.53</td><td>1.230</td><td>23.10</td></tr>
+          <tr><td>ONOPT-OM</td><td>1.253</td><td>22.42</td><td>1.237</td><td>23.76</td></tr>
+          <tr class="highlight"><td>RPB-OM，\(\tau=1\)</td><td>1.249</td><td>22.75</td><td>1.220</td><td>24.34</td></tr>
+          <tr class="highlight"><td>RPB-OM，\(\tau=2\)</td><td>1.252</td><td>22.70</td><td>1.215</td><td>24.49</td></tr>
+          <tr class="highlight"><td>RPB-OM，\(\tau=4\)</td><td>1.254</td><td>22.64</td><td>1.213</td><td>24.55</td></tr>
+        </tbody>
+      </table></div>
+      <div class="result-strip">
+        <article><strong>1.249</strong><span>PLECO 上的最佳平均代价比，由 \(\tau=1\) 的 RPB-OM 取得。</span></article>
+        <article><strong>1.213</strong><span>POPU 上的最佳平均代价比，由 \(\tau=4\) 的 RPB-OM 取得。</span></article>
+        <article><strong>对 \(\tau\) 不敏感</strong><span>从 \(1\) 调整到 \(4\) 时结果变化很小，降低了实际调参负担。</span></article>
+      </div>
+      <p>合成噪声实验回答的是另一层问题：预测越差，完全依赖预测的方法退化越明显，而 RPB-OM 的代价始终受到控制。两类实验共同说明，理论保证并非只起防守作用，算法仍能从真实预测器中获得实际收益。</p>
+
+      <h2>6. 可以迁移的设计思想</h2>
+      <p>这项工作最值得迁移的，是一种在线记账原则：学习信号不能凭置信度直接获得决策权，而要凭相对于安全基线的可观测进展赚取决策权。这一思路还可用于调度、准入控制、资源分配等预测有价值但失效代价必须受控的系统问题。</p>
+
+      <section class="article-related"><h2>研究脉络</h2><div class="article-related-links"><a href="https://proceedings.neurips.cc/paper_files/paper/2024/hash/cd96cb9a239c37b39dbf34f3f5a4c56f-Abstract-Conference.html" target="_blank" rel="noopener">PFSUM：学习增强 Bahncard problem &#8599;</a><a href="https://neurips.cc/virtual/2025/loc/san-diego/poster/116615" target="_blank" rel="noopener">Guard：鲁棒学习增强缓存 &#8599;</a></div></section>
+    </article>
+  </main>
+
+  <footer class="site-footer"><div class="container footer-inner"><span>&copy; 2026 赵海亮 &middot; 浙江大学</span><span><a href="/index_zh.html">主页</a></span></div></footer>
+</body>
+</html>
