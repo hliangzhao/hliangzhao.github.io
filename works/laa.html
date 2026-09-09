@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="A detailed guide to the survey Learning-Augmented Algorithms: Guarantees, Construction Mechanisms, and System-Level Implications.">
+  <title>Learning-Augmented Algorithms | Hailiang Zhao</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Source+Serif+4:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css?v=20260830">
+  <script src="/js/mathjax-config.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+<body>
+  <header class="site-header"><nav class="nav container" aria-label="Primary navigation">
+    <a class="brand" href="/index.html"><span class="brand-mark">HZ</span> Hailiang Zhao</a>
+    <div class="nav-links"><a href="/index.html#contributions">Research</a><a href="/index.html#publications">Publications</a><a class="lang-link" href="/works/laa_zh.html" lang="zh-CN">中文</a></div>
+  </nav></header>
+
+  <main>
+    <section class="article-hero"><div class="article-shell">
+      <div class="article-kicker">arXiv 2026 &middot; Survey</div>
+      <h1>Learning-Augmented Algorithms: Guarantees, Construction Mechanisms, and System-Level Implications</h1>
+      <p class="article-deck">A framework for asking when predictions improve an algorithm, what remains guaranteed when they fail, and what changes when the algorithm becomes part of a system.</p>
+      <p class="article-authors">Hailiang Zhao, Xueyan Tang, Peng Chen, Zenong Ye, Tianjun Zhu, Jianwei Yin, and Shuiguang Deng</p>
+      <div class="article-actions"><a class="button button-primary" href="https://arxiv.org/abs/2609.04787" target="_blank" rel="noopener">Paper &#8599;</a><a class="button button-secondary" href="https://arxiv.org/pdf/2609.04787" target="_blank" rel="noopener">PDF &#8599;</a><a class="button button-secondary" href="/index.html#contributions">Back to contributions</a></div>
+    </div></section>
+
+    <article class="article-main article-shell article-body">
+      <p class="article-lead">A prediction can make an online decision far better than a conservative worst-case rule, but it can also fail exactly when the decision is most consequential. This survey organizes the field around that tension. Its central move is to separate three questions: what the predictor says, how the algorithm uses it, and what the theorem actually proves.</p>
+
+      <div class="article-summary">
+        <article><strong>A formal contract</strong><span>Consistency, robustness, and error-dependent performance describe distinct behaviors.</span></article>
+        <article><strong>Two independent axes</strong><span>Five construction mechanisms are separated from theorem-level tightness evidence.</span></article>
+        <article><strong>A systems accounting</strong><span>Prediction cost, feedback, state, and composition must be modeled explicitly.</span></article>
+      </div>
+
+      <h2>1. Why this field needs more than a list of applications</h2>
+      <p>Classical online algorithms make decisions without knowing the future. Their worst-case guarantees are dependable, but can be conservative when workloads are predictable. A learned policy takes the opposite bet: it uses historical regularity to improve average behavior, but its performance outside the evaluation distribution may be unclear.</p>
+      <p>Learning-augmented algorithms place a fallible prediction inside a formally analyzed algorithm. This is not simply machine learning followed by a fallback. The prediction interface, the error measure, the fallback state, and the objective all participate in the proof. Two papers can both use a next-arrival predictor and still establish incomparable results if they normalize error differently or compete against different benchmarks.</p>
+      <div class="article-note"><strong>The survey's organizing question:</strong> Where does the prediction enter the construction, and which parts of the claimed performance are upper bounds, matched limits, or empirical systems evidence?</div>
+
+      <h2>2. The basic contract: good advice should help, bad advice should not be catastrophic</h2>
+      <p>Let (I) be an instance, (hat y) a prediction, (y^*(I)) the unknown target, and (eta(I,hat y)) a task-specific prediction error. A learning-augmented algorithm (A) is compared with the offline optimum (operatorname{OPT}(I)). The survey uses a trust parameter (lambdain[0,1]), chosen before the unrevealed part of the instance is seen; smaller (lambda) means greater trust in the prediction.</p>
+      <div class="math-block"><div class="math-caption">Three different promises</div>
+
+        \[
+          \text{Consistency:}\quad
+          \mathbb E[\operatorname{cost}(A(I,\hat y))]
+          \leq \alpha(\lambda)\operatorname{OPT}(I)
+          \quad\text{when }\eta(I,\hat y)=0,
+        \]
+        \[
+          \text{Robustness:}\quad
+          \frac{\mathbb E[\operatorname{cost}(A(I,\hat y))]}{\operatorname{OPT}(I)}
+          \leq \beta(\lambda)
+          \quad\text{for every }\hat y,
+        \]
+        \[
+          \text{Smoothness:}\quad
+          \frac{\mathbb E[\operatorname{cost}(A(I,\hat y))]}{\operatorname{OPT}(I)}
+          \leq g_{\lambda}(\eta(I,\hat y)).
+        \]
+      </div>
+      <p>These statements are related but not interchangeable. A smoothness curve can grow without bound and therefore provide no prediction-independent robustness. A strong consistency guarantee says what happens at zero error, but says nothing by itself about a small nonzero error. A consistency-robustness pair is a tight frontier only when a lower bound rules out every better pair under the same formal model.</p>
+
+      <h3>Ski rental makes the trade-off visible</h3>
+      <p>Suppose renting costs one per day, buying costs (B), and a predictor estimates the number of ski days. A parameterized rule trusts the estimate more as (lambda) decreases. One standard guarantee has the form</p>
+      <div class="math-block">
+        \[
+          \operatorname{CR}
+          \leq
+          \min\!\left\{
+            1+\frac{1}{\lambda},
+            1+\lambda+\frac{\eta_{\mathrm{abs}}}{(1-\lambda)\operatorname{OPT}}
+          \right\}.
+        \]
+        <p>At zero error, the second branch gives consistency (1+lambda). For arbitrary error, the first branch caps the ratio at (1+1/lambda). More trust improves consistency but weakens the worst-case cap.</p>
+      </div>
+
+      <h2>3. Before choosing an algorithm, specify the prediction</h2>
+      <p>The predictor output is part of the problem definition. The survey distinguishes several task objects and treats uncertainty or semantic representation as additional interface qualifiers.</p>
+      <div class="technical-grid">
+        <article class="technical-card"><h3>Point prediction</h3><p>A scalar or vector such as a horizon, job size, or next-request time. Absolute and relative errors lead to different bounds.</p></article>
+        <article class="technical-card"><h3>Distributional prediction</h3><p>A probability distribution used by a search or scheduling rule. The theorem must name its distance and regularity assumptions.</p></article>
+        <article class="technical-card"><h3>Ordinal prediction</h3><p>A ranking or set of pairwise comparisons. Inversions may matter more than numerical distance.</p></article>
+        <article class="technical-card"><h3>Structural prediction</h3><p>A matching, dual solution, edge set, or other combinatorial object that may be repaired or used as a warm start.</p></article>
+      </div>
+      <p>An error metric is not a reporting detail. It determines which mistakes are expensive in the theorem. It also matters when the true target becomes observable. An error revealed after an irreversible decision can support retrospective evaluation, but cannot directly drive an online trust controller.</p>
+
+      <h2>4. Five ways predictions enter a provable construction</h2>
+      <p>The survey's first axis classifies the mechanism, rather than the application domain. The five labels are non-exclusive, so one paper may use more than one.</p>
+      <figure class="web-figure">
+        <div class="web-figure-title">Axis A: construction mechanism</div>
+        <div class="mechanism-flow" aria-label="Five construction mechanisms for learning-augmented algorithms">
+          <div class="flow-step flow-step-accent"><strong>P1</strong>Trust-based combination</div>
+          <div class="flow-step"><strong>P2</strong>Prediction-guided primal-dual method</div>
+          <div class="flow-step flow-step-accent"><strong>P3</strong>Prediction-sensitive relaxation and rounding</div>
+          <div class="flow-step"><strong>P4</strong>Prediction access, portfolio, and switching</div>
+          <div class="flow-step flow-step-accent"><strong>P5</strong>Direct use of a predicted distribution</div>
+        </div>
+        <figcaption>This diagram is rendered with native web elements. The labels describe where prediction enters; none of them alone implies consistency, robustness, or tightness.</figcaption>
+      </figure>
+      <ol class="principle-list">
+        <li><span class="term">P1: trust-based combination.</span> A prediction-following method is mixed or interpolated with a prediction-free baseline. A one-shot randomized mixture and a continuously parameterized algorithm are different constructions. Dynamic switching additionally requires state-migration accounting.</li>
+        <li><span class="term">P2: prediction-guided primal-dual methods.</span> Advice initializes, steers, or repairs primal or dual variables. Feasibility and a dual invariant do the real work in the proof; a predicted dual has no generic guarantee without them.</li>
+        <li><span class="term">P3: prediction-sensitive relaxation and rounding.</span> Prediction improves a fractional construction, then a compatible online rounding theorem produces an integral decision. The rounding factor may dominate the final ratio or prevent exact consistency.</li>
+        <li><span class="term">P4: access, portfolio, and switching reductions.</span> The algorithm controls which predictor or policy is queried or followed. Low regret on a surrogate loss becomes meaningful only through a problem-specific reduction to actual cost, compatible state transitions, and an appropriate comparator.</li>
+        <li><span class="term">P5: distributional predictions.</span> A predicted distribution directly changes a search, schedule, or decision rule. Error-dependent performance remains tied to a stated distance and objective; there is no universal transfer from Wasserstein distance or a risk measure to system cost.</li>
+      </ol>
+
+      <h2>5. A second axis prevents strong claims from being blurred together</h2>
+      <p>Axis B records theorem-level evidence independently of the mechanism. <span class="term">E0</span> means the survey records an achieved upper bound but does not pair it with a matching lower bound in the same model. <span class="term">E1</span> means the asymptotic dependence is matched under the same prediction model, error metric, adversary, benchmark, and computational assumptions.</p>
+      <div class="table-scroll"><table class="technical-table">
+        <caption>How the two-axis reading works</caption>
+        <thead><tr><th>Representative result</th><th>Mechanism</th><th>Evidence</th><th>What the label says</th></tr></thead>
+        <tbody>
+          <tr><td>Deterministic ski rental</td><td>P1</td><td>E1</td><td>Matched asymptotic trade-off in its model</td></tr>
+          <tr><td>Caching with next-arrival predictions</td><td>P1</td><td>E0</td><td>Upper and lower bounds still leave a gap</td></tr>
+          <tr><td>Binary search with distributional predictions</td><td>P5</td><td>E1</td><td>Matched dependence on distributional error</td></tr>
+          <tr><td>Metrical task systems with bandit predictor access</td><td>P4</td><td>E0</td><td>Known lower bound leaves logarithmic factors</td></tr>
+        </tbody>
+      </table></div>
+      <p>E0 is not a judgment that a result is weak, and E1 is not a maturity score. Tightness does not transfer across different models. Empirical systems evidence is marked separately because measured performance and a competitive theorem answer different questions.</p>
+
+      <h2>6. The same framework spans different objectives</h2>
+      <p>The survey follows the mechanisms through five domains: online optimization, caching and paging, learned data structures, graph algorithms and networking, and mechanism design. This breadth reveals recurring proof devices, but also a reason for caution. These domains optimize different quantities, including competitive ratio, approximation quality, query complexity, running time, and social welfare.</p>
+      <p>For example, a learned index may preserve correctness by searching a certified interval around a predicted key position. That is a valuable guarantee, but it is not automatically a consistency-robustness theorem for update latency. Likewise, a strategyproof mechanism must preserve incentives in addition to feasibility, so an algorithmic robustifier cannot be transferred without rechecking the strategic model.</p>
+
+      <h2>7. From a component theorem to an operating system</h2>
+      <p>A component theorem typically studies one prediction interface and one objective. A deployment connects prediction, decision, actuation, and feedback, often across shared compute and state. The survey isolates three omissions that become first-class systems concerns:</p>
+      <ol class="principle-list">
+        <li><span class="term">Predictions are not free.</span> Model inference, queries, retraining, and data collection consume time and resources that the classical competitive objective usually does not charge.</li>
+        <li><span class="term">Error can be late and endogenous.</span> Ground truth may arrive after the action, be censored by it, or change because the policy changes future observations.</li>
+        <li><span class="term">Components are not isolated.</span> One stage can alter the instance, state, and offline benchmark seen by the next. Local ratios therefore do not automatically multiply into a system ratio.</li>
+      </ol>
+      <figure class="web-figure">
+        <div class="web-figure-title">An accounting view of a learning-augmented deployment</div>
+        <div class="mechanism-flow" aria-label="Learning-augmented system decision and feedback path">
+          <div class="flow-step"><strong>Signals</strong>Telemetry, traces, logs, and request streams</div>
+          <div class="flow-step flow-step-accent"><strong>Prediction</strong>Typed output, calibration, and uncertainty</div>
+          <div class="flow-step"><strong>Decision and safety</strong>Augmented algorithm, constraints, and fallback</div>
+          <div class="flow-step flow-step-accent"><strong>Actuation</strong>Evict, schedule, provision, or route</div>
+          <div class="flow-step"><strong>Feedback</strong>Fast safety signals and delayed labels</div>
+        </div>
+        <figcaption>The solid decision path and the feedback path run on different timescales. A delayed label can support recalibration, but cannot undo an irreversible action.</figcaption>
+      </figure>
+
+      <h3>Pricing a predictor changes the guarantee</h3>
+      <p>If each call costs (c) in the units of the system objective and (Q_A) is the number of calls, the survey proposes the accounting quantity</p>
+      <div class="math-block">
+        \[
+          \operatorname{cost}_{c}(A)
+          =\mathbb E\!\left[\operatorname{cost}(A)+cQ_A\right].
+        \]
+        <p>Against an offline optimum that is not charged for predictions, exact multiplicative 1-consistency is impossible whenever perfect-prediction instances still require a positive expected prediction cost, unless the model adds an additive term or changes the benchmark.</p>
+      </div>
+
+      <h3>Composition needs interface facts, not only local ratios</h3>
+      <p>The survey gives limited sufficient conditions for three patterns. Additive composition needs component costs and offline benchmarks to share a pathwise decomposition. Cascaded composition needs bounds on how each stage distorts the next stage's benchmark. Error propagation needs metrics and Lipschitz-like sensitivity on every connecting edge:</p>
+      <div class="math-block"><div class="math-caption">One-step error propagation</div>
+        \[
+          \eta_{i+1}
+          \leq L_i h_i(\eta_i)+\varepsilon^{\mathrm{own}}_{i+1}.
+        \]
+        <p>If an edge has no meaningful metric, sensitivity bound, or perturbation model, this argument supplies no transferred smoothness guarantee.</p>
+      </div>
+
+      <h2>8. What changes when the prediction is generated as language</h2>
+      <p>Most learning-augmented theorems expect a number, ranking, distribution, or combinatorial structure. A foundation model may emit free-form text. The text becomes usable only after an adapter maps it to a typed task object and the system defines an error measure that the downstream theorem understands.</p>
+      <div class="technical-grid">
+        <article class="technical-card"><h3>Predictor</h3><p>Produces a duration, order, or other formal object. Parsing and the theorem's error assumptions still apply.</p></article>
+        <article class="technical-card"><h3>Adapter</h3><p>Extracts structured input from text. Validation must cover the adapter's failure modes.</p></article>
+        <article class="technical-card"><h3>Policy synthesizer</h3><p>Proposes a rule or fallback. The artifact needs verification and deployment controls.</p></article>
+        <article class="technical-card"><h3>Explainer</h3><p>Summarizes telemetry for an operator. Provenance and uncertainty still matter because the output can influence action.</p></article>
+      </div>
+      <p>Token likelihood is not automatically a calibrated probability of task correctness, and agreement across sampled responses measures self-consistency rather than labeled accuracy. Rich semantic reasoning may be useful, but it does not improve an existing guarantee without a new information model and proof.</p>
+
+      <h2>9. The research agenda</h2>
+      <p>The survey closes with four connected challenges: pricing prediction within the objective, developing a calculus for composition, modeling policy-dependent or strategic error, and making empirical benchmarks comparable. The broader lesson is methodological. A prediction should be treated as a typed, fallible, and priced input to an algorithm, not as an informal source of intelligence. A guarantee belongs to the complete contract among prediction, decision, state, objective, and benchmark.</p>
+
+      <section class="article-related"><h2>Research trajectory</h2><div class="article-related-links"><a href="https://proceedings.neurips.cc/paper_files/paper/2024/hash/cd96cb9a239c37b39dbf34f3f5a4c56f-Abstract-Conference.html" target="_blank" rel="noopener">PFSUM: learning-augmented Bahncard problem &#8599;</a><a href="https://neurips.cc/virtual/2025/loc/san-diego/poster/116615" target="_blank" rel="noopener">Guard: robust learning-augmented caching &#8599;</a><a href="/works/rpb.html">RPB: near-optimal robustness for paging</a></div></section>
+    </article>
+  </main>
+
+  <footer class="site-footer"><div class="container footer-inner"><span>&copy; 2026 Hailiang Zhao &middot; Zhejiang University</span><span><a href="/index.html">Home</a></span></div></footer>
+</body>
+</html>

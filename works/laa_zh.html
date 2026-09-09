@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="综述 Learning-Augmented Algorithms: Guarantees, Construction Mechanisms, and System-Level Implications 的详细解读。">
+  <title>学习增强算法综述解读 | 赵海亮</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700&amp;family=Source+Serif+4:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css?v=20260830">
+  <script src="/js/mathjax-config.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+<body>
+  <header class="site-header"><nav class="nav container" aria-label="主导航">
+    <a class="brand" href="/index_zh.html"><span class="brand-mark">HZ</span> 赵海亮</a>
+    <div class="nav-links"><a href="/index_zh.html#contributions">研究工作</a><a href="/index_zh.html#publications">代表论文</a><a class="lang-link" href="/works/laa.html" lang="en">English</a></div>
+  </nav></header>
+
+  <main>
+    <section class="article-hero"><div class="article-shell">
+      <div class="article-kicker">arXiv 2026 &middot; 综述</div>
+      <h1>Learning-Augmented Algorithms: Guarantees, Construction Mechanisms, and System-Level Implications</h1>
+      <p class="article-deck">预测准确时，算法能得到多少收益？预测失准时，最坏结果是否仍然可控？当算法进入真实系统后，原有保证还缺少哪些条件？</p>
+      <p class="article-authors">Hailiang Zhao, Xueyan Tang, Peng Chen, Zenong Ye, Tianjun Zhu, Jianwei Yin, and Shuiguang Deng</p>
+      <div class="article-actions"><a class="button button-primary" href="https://arxiv.org/abs/2609.04787" target="_blank" rel="noopener">论文 &#8599;</a><a class="button button-secondary" href="https://arxiv.org/pdf/2609.04787" target="_blank" rel="noopener">PDF &#8599;</a><a class="button button-secondary" href="/index_zh.html#contributions">返回代表性工作</a></div>
+    </div></section>
+
+    <article class="article-main article-shell article-body">
+      <p class="article-lead">在线算法若能预知未来，往往可以作出更好的决定；但预测一旦失准，也可能在最关键的时刻误导系统。这篇综述围绕这一矛盾展开，重点区分三个问题：预测器提供什么信息，算法以何种机制使用预测，以及定理究竟证明了什么。</p>
+
+      <div class="article-summary">
+        <article><strong>一套形式化契约</strong><span>一致性、鲁棒性和误差相关性能分别描述不同情形。</span></article>
+        <article><strong>两个相互独立的分类轴</strong><span>五类算法构造机制与定理层面的紧致性证据分开记录。</span></article>
+        <article><strong>一套系统记账框架</strong><span>把预测成本、反馈、状态和组件组合纳入分析。</span></article>
+      </div>
+
+      <h2>1. 为什么不能只按应用领域梳理</h2>
+      <p>经典在线算法在不知道未来的条件下作出决策。它们的最坏情况保证可靠，但面对高度可预测的负载时往往偏保守。纯学习策略则作出相反选择，利用历史规律追求平均性能，却未必能说明在分布变化甚至对抗性输入下会发生什么。</p>
+      <p>学习增强算法把可能出错的预测嵌入一个可证明的算法中。它并不等于“机器学习模型加一个兜底策略”。预测接口、误差定义、兜底状态和优化目标都属于证明的一部分。即便两项工作都预测下一次请求时间，如果误差归一化方式或比较基准不同，它们的结论也未必能够直接比较。</p>
+      <div class="article-note"><strong>这篇综述关注的核心问题：</strong>预测究竟在算法构造的哪个位置发挥作用？相关结论是已取得的上界、上下界匹配的极限，还是经验性的系统证据？</div>
+
+      <h2>2. 基本契约：好预测应当有用，坏预测不能让代价失控</h2>
+      <p>设 (I) 为问题实例，(hat y) 为预测结果，(y^*(I)) 为尚未知晓的真实目标，(eta(I,hat y)) 为任务相关的预测误差。学习增强算法 (A) 与离线最优解 (operatorname{OPT}(I)) 比较。综述用 (lambdain[0,1]) 表示事先选定的信任参数，(lambda) 越小，算法越信任预测。</p>
+      <div class="math-block"><div class="math-caption">三类不同的性能承诺</div>
+        \[
+          \text{一致性：}\quad
+          \mathbb E[\operatorname{cost}(A(I,\hat y))]
+          \leq \alpha(\lambda)\operatorname{OPT}(I)
+          \quad\text{当 }\eta(I,\hat y)=0,
+        \]
+        \[
+          \text{鲁棒性：}\quad
+          \frac{\mathbb E[\operatorname{cost}(A(I,\hat y))]}{\operatorname{OPT}(I)}
+          \leq \beta(\lambda)
+          \quad\text{对任意 }\hat y,
+        \]
+        \[
+          \text{平滑性：}\quad
+          \frac{\mathbb E[\operatorname{cost}(A(I,\hat y))]}{\operatorname{OPT}(I)}
+          \leq g_{\lambda}(\eta(I,\hat y)).
+        \]
+      </div>
+      <p>这三项性质有关联，却不能彼此替代。一个随误差无限增长的平滑性上界，并没有给出与预测无关的鲁棒性；一致性只说明误差恰好为零时的表现，不能自动说明小误差下是否稳定；只有同一形式化模型中的下界排除了所有更优组合，一致性与鲁棒性的折中曲线才能称为紧致。</p>
+
+      <h3>滑雪租赁问题把折中关系讲得最清楚</h3>
+      <p>假设每天租雪具的成本为 1，直接购买的成本为 (B)，预测器给出滑雪天数。参数化算法在 (lambda) 较小时更相信预测。一类经典规则具有如下保证：</p>
+      <div class="math-block">
+        \[
+          \operatorname{CR}
+          \leq
+          \min\!\left\{
+            1+\frac{1}{\lambda},
+            1+\lambda+\frac{\eta_{\mathrm{abs}}}{(1-\lambda)\operatorname{OPT}}
+          \right\}.
+        \]
+        <p>预测完全准确时，第二项给出 (1+lambda) 的一致性；无论预测错得多严重，第一项都把竞争比限制在 (1+1/lambda) 以内。更信任预测可以改善一致性，但会放宽最坏情况上界。</p>
+      </div>
+
+      <h2>3. 选算法之前，先说明究竟预测什么</h2>
+      <p>预测输出本身就是问题定义的一部分。综述区分四类常见任务对象，并把不确定性信息和语义表示视为额外的接口属性。</p>
+      <div class="technical-grid">
+        <article class="technical-card"><h3>点预测</h3><p>输出一个标量或向量，例如运行时长、作业规模或下一次请求时间。绝对误差和相对误差会导出不同结论。</p></article>
+        <article class="technical-card"><h3>分布预测</h3><p>输出概率分布，并直接参与搜索或调度。定理必须明确分布距离及其正则条件。</p></article>
+        <article class="technical-card"><h3>序关系预测</h3><p>输出排序或成对比较。此时真正有意义的误差可能是逆序数，而非数值距离。</p></article>
+        <article class="technical-card"><h3>结构预测</h3><p>输出匹配、对偶解、边集等组合对象，供算法修复或作为优化的初始解。</p></article>
+      </div>
+      <p>误差度量不是论文中的附属指标，它决定定理认为哪些错误更昂贵。真实目标何时可观测也同样关键。如果误差只能在不可逆决策之后得到，它可以用于事后评估，却不能直接指导当下的信任调整。</p>
+
+      <h2>4. 预测进入可证明算法的五种方式</h2>
+      <p>综述的第一条分类轴不按应用领域划分，而是追问预测在构造中出现在哪里。五种机制并不互斥，同一篇论文可以同时具有多个标签。</p>
+      <figure class="web-figure">
+        <div class="web-figure-title">分类轴 A：算法构造机制</div>
+        <div class="mechanism-flow" aria-label="学习增强算法的五类构造机制">
+          <div class="flow-step flow-step-accent"><strong>P1</strong>基于信任的组合</div>
+          <div class="flow-step"><strong>P2</strong>预测引导的原始对偶方法</div>
+          <div class="flow-step flow-step-accent"><strong>P3</strong>预测敏感的松弛与舍入</div>
+          <div class="flow-step"><strong>P4</strong>预测访问、组合与切换</div>
+          <div class="flow-step flow-step-accent"><strong>P5</strong>直接使用预测分布</div>
+        </div>
+        <figcaption>该图由网页原生元素绘制。标签只说明预测进入算法的位置，本身并不代表一致性、鲁棒性或紧致性。</figcaption>
+      </figure>
+      <ol class="principle-list">
+        <li><span class="term">P1：基于信任的组合。</span> 把预测驱动方法与不依赖预测的基线进行混合或插值。运行前一次性随机选择算法，与运行中动态切换算法并非同一机制；后者还要计算状态迁移成本。</li>
+        <li><span class="term">P2：预测引导的原始对偶方法。</span> 预测用于初始化、引导或修复原始变量和对偶变量。证明真正依赖的是可行性与对偶不变量，单独给出一个预测对偶解并不会自动带来保证。</li>
+        <li><span class="term">P3：预测敏感的松弛与舍入。</span> 预测先改善分数解，再由兼容的在线舍入定理得到整数决策。舍入因子可能主导最终竞争比，也可能使完美预测下的结果仍无法达到精确最优。</li>
+        <li><span class="term">P4：预测访问、组合与切换。</span> 算法决定何时查询预测器，以及跟随哪个预测器或策略。替代损失上的低遗憾只有经过任务相关的代价归约、状态兼容分析和合理比较基准，才能转化为在线问题的性能结论。</li>
+        <li><span class="term">P5：分布预测。</span> 预测分布直接改变搜索、调度或其他决策规则。误差相关结论始终依赖具体的分布距离与目标函数，不能把 Wasserstein 距离或某种风险度量直接泛化成通用的系统代价定理。</li>
+      </ol>
+
+      <h2>5. 第二条分类轴：别把“已有上界”和“达到极限”混为一谈</h2>
+      <p>分类轴 B 独立记录定理层面的证据。<span class="term">E0</span> 表示综述记录了已达到的上界，但在同一模型中没有配对记录匹配的下界。<span class="term">E1</span> 表示在相同预测模型、误差度量、对手、比较基准和计算条件下，上下界具有匹配的渐近依赖关系。</p>
+      <div class="table-scroll"><table class="technical-table">
+        <caption>如何同时阅读两条分类轴</caption>
+        <thead><tr><th>代表性结果</th><th>构造机制</th><th>证据</th><th>含义</th></tr></thead>
+        <tbody>
+          <tr><td>确定性滑雪租赁</td><td>P1</td><td>E1</td><td>该模型中的渐近折中关系已匹配</td></tr>
+          <tr><td>使用下一次到达预测的缓存算法</td><td>P1</td><td>E0</td><td>已知上下界之间仍有差距</td></tr>
+          <tr><td>使用分布预测的二分搜索</td><td>P5</td><td>E1</td><td>对分布误差的依赖关系已匹配</td></tr>
+          <tr><td>受限访问预测器的度量任务系统</td><td>P4</td><td>E0</td><td>已知下界仍留有对数因子</td></tr>
+        </tbody>
+      </table></div>
+      <p>E0 不是对工作价值的否定，E1 也不是成熟度排名。紧致性不能跨不同模型移植。经验性的系统结果则单独标注，因为实测性能与竞争分析回答的是两类问题。</p>
+
+      <h2>6. 同一套框架覆盖的是不同目标</h2>
+      <p>综述沿着五类机制考察了在线优化、缓存与分页、学习型数据结构、图算法与网络，以及机制设计五个领域。跨领域梳理可以看出反复出现的证明工具，也提醒我们不能把所有结论排在同一把尺子上。不同问题关注的可能是竞争比、近似质量、查询复杂度、运行时间或社会福利。</p>
+      <p>例如，学习型索引可以围绕预测位置搜索一个经过认证的区间，从而保持查询正确性。这是很有价值的保证，但并不自动等价于针对更新延迟的一致性与鲁棒性定理。又如，机制设计除了满足可行性，还必须保持激励相容，因此其他领域的鲁棒化方法不能在不检查博弈模型的情况下直接照搬。</p>
+
+      <h2>7. 从单个定理走向实际运行的系统</h2>
+      <p>组件定理通常只分析一个预测接口和一个目标。真实部署则把预测、决策、执行和反馈串联起来，还可能共享计算资源和系统状态。综述把三个常被组件分析省略的问题单独提出：</p>
+      <ol class="principle-list">
+        <li><span class="term">预测不是免费的。</span> 模型推理、查询、重训练和数据采集都消耗时间与资源，而经典竞争分析通常不会计入这些成本。</li>
+        <li><span class="term">误差可能延迟出现，也可能由策略自身造成。</span> 真值可能在行动之后才能得到，可能被行动遮蔽，也可能因为策略改变了未来观测而发生变化。</li>
+        <li><span class="term">组件并非彼此独立。</span> 上游输出会改变下游看到的实例、状态和离线最优基准，因此局部竞争比不能自动组合成系统级竞争比。</li>
+      </ol>
+      <figure class="web-figure">
+        <div class="web-figure-title">学习增强系统的记账视角</div>
+        <div class="mechanism-flow" aria-label="学习增强系统的决策与反馈路径">
+          <div class="flow-step"><strong>信号</strong>遥测、调用链、日志和请求流</div>
+          <div class="flow-step flow-step-accent"><strong>预测</strong>类型明确的输出、校准与不确定性</div>
+          <div class="flow-step"><strong>决策与保障</strong>学习增强算法、约束和兜底机制</div>
+          <div class="flow-step flow-step-accent"><strong>执行</strong>淘汰、调度、扩缩容或路由</div>
+          <div class="flow-step"><strong>反馈</strong>快速安全信号与延迟到达的标签</div>
+        </div>
+        <figcaption>决策路径和反馈路径往往处于不同时间尺度。延迟标签可以帮助重新校准模型，却无法撤销已经发生的不可逆行动。</figcaption>
+      </figure>
+
+      <h3>把预测成本计入目标后，原有结论会改变</h3>
+      <p>如果一次预测调用在系统目标中折算为成本 (c)，算法共调用 (Q_A) 次，综述提出如下记账量：</p>
+      <div class="math-block">
+        \[
+          \operatorname{cost}_{c}(A)
+          =\mathbb E\!\left[\operatorname{cost}(A)+cQ_A\right].
+        \]
+        <p>若离线最优基准无需承担预测成本，而完美预测下算法仍然必须付出正的期望调用成本，那么精确的乘法型 1-一致性就不可能成立，除非模型允许加性项，或者重新定义比较基准。</p>
+      </div>
+
+      <h3>组件组合需要接口事实，不能只拿局部竞争比相乘</h3>
+      <p>综述为三种组合方式给出了有限的充分条件。加性组合要求各组件代价与离线基准能够在每条执行路径上统一分解；级联组合要求明确上游对下游基准造成多大扭曲；误差传播则要求每条连接边都具备合适的度量和类似 Lipschitz 的敏感性：</p>
+      <div class="math-block"><div class="math-caption">单步误差传播</div>
+        \[
+          \eta_{i+1}
+          \leq L_i h_i(\eta_i)+\varepsilon^{\mathrm{own}}_{i+1}.
+        \]
+        <p>如果某条接口没有合理的度量、敏感性上界或扰动模型，这套推导就不能把上游平滑性转移到下游。</p>
+      </div>
+
+      <h2>8. 当预测器开始输出自然语言</h2>
+      <p>多数学习增强定理接收的是数值、排序、分布或组合结构，而基础模型可能输出自由文本。要让这类输出进入形式化算法，首先需要适配器把文本映射成类型明确的任务对象，再定义下游定理能够使用的误差。</p>
+      <div class="technical-grid">
+        <article class="technical-card"><h3>作为预测器</h3><p>输出时长、顺序等形式化对象。解析过程和定理要求的误差假设仍需成立。</p></article>
+        <article class="technical-card"><h3>作为适配器</h3><p>从文本抽取结构化输入。验证机制必须覆盖适配器自身的失败方式。</p></article>
+        <article class="technical-card"><h3>作为策略生成器</h3><p>提出规则或兜底策略。生成物仍然需要验证和部署控制。</p></article>
+        <article class="technical-card"><h3>作为解释器</h3><p>为运维人员整理遥测信息。输出会影响行动，因此仍需标明来源与不确定性。</p></article>
+      </div>
+      <p>词元概率并不自动等于任务正确率，多个采样结果相互一致也只说明自洽性，不等于经过标签验证的准确率。语义推理可以提供有价值的信息，但若没有新的信息模型和证明，它不会自动改进已有的算法保证。</p>
+
+      <h2>9. 接下来值得研究什么</h2>
+      <p>综述最后提出四组相互关联的问题：如何在优化目标中给预测定价，如何建立更一般的组合演算，如何处理由策略引起的误差以及对抗性和策略性误差，如何让实验基准真正可比较。贯穿全文的方法论是，预测应被视为一种类型明确、可能出错并且具有成本的算法输入，而不是笼统的“智能”。任何保证都属于预测、决策、状态、目标与比较基准构成的完整契约。</p>
+
+      <section class="article-related"><h2>相关研究脉络</h2><div class="article-related-links"><a href="https://proceedings.neurips.cc/paper_files/paper/2024/hash/cd96cb9a239c37b39dbf34f3f5a4c56f-Abstract-Conference.html" target="_blank" rel="noopener">PFSUM：学习增强 Bahncard problem &#8599;</a><a href="https://neurips.cc/virtual/2025/loc/san-diego/poster/116615" target="_blank" rel="noopener">Guard：鲁棒学习增强缓存算法 &#8599;</a><a href="/works/rpb_zh.html">RPB：逼近最优鲁棒性的分页算法</a></div></section>
+    </article>
+  </main>
+
+  <footer class="site-footer"><div class="container footer-inner"><span>&copy; 2026 赵海亮 &middot; 浙江大学</span><span><a href="/index_zh.html">首页</a></span></div></footer>
+</body>
+</html>
