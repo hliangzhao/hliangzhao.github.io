@@ -124,8 +124,19 @@ details .details-inner { padding: 0 15px 7px; }
 .site-footer { padding: 21px 0; color: #c5d0da; background: #102131; font-size: .8rem; }
 .footer-inner { display: flex; flex-wrap: wrap; align-items: center; gap: 15px; }
 .footer-inner > span:first-child { margin-right: auto; }
-.site-footer .cycling-easter-egg { position: relative; display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; color: #a6b7c6; border: 1px solid transparent; border-radius: 50%; text-decoration: none; }
+.site-footer .cycling-easter-egg { position: relative; display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; color: #c9dfa0; border: 1px solid transparent; border-radius: 50%; text-decoration: none; }
 .site-footer .cycling-easter-egg:hover, .site-footer .cycling-easter-egg:focus-visible { color: #d6ef88; border-color: #526149; }
+/* A quiet moving signpost to the road-bike atlas. */
+.cycling-icon { overflow: visible; animation: cycling-roll 2.8s ease-in-out infinite; }
+.cycling-wheel { transform-box: view-box; animation: cycling-spin 2.4s linear infinite; }
+.cycling-wheel-rear { transform-origin: 9px 21px; }
+.cycling-wheel-front { transform-origin: 31px 21px; }
+.cycling-crank { transform-box: view-box; transform-origin: 22px 21px; animation: cycling-spin 4.8s linear infinite; }
+.cycling-easter-egg:hover .cycling-wheel, .cycling-easter-egg:focus-visible .cycling-wheel { animation-duration: 1.2s; }
+.cycling-easter-egg:hover .cycling-crank, .cycling-easter-egg:focus-visible .cycling-crank { animation-duration: 2.4s; }
+@keyframes cycling-spin { to { transform: rotate(360deg); } }
+@keyframes cycling-roll { 0%, 100% { transform: translateY(0); } 35% { transform: translateY(-1.5px) rotate(-1deg); } 70% { transform: translateY(.5px) rotate(.6deg); } }
+@media (prefers-reduced-motion: reduce) { .cycling-icon, .cycling-wheel, .cycling-crank { animation: none !important; } }
 .cycling-hint { position: absolute; right: 0; bottom: calc(100% + 10px); padding: 6px 10px; color: #e8efdf; background: #203345; border: 1px solid #435563; border-radius: 4px; font-size: .75rem; white-space: nowrap; opacity: 0; visibility: hidden; pointer-events: none; }
 .cycling-easter-egg:hover .cycling-hint, .cycling-easter-egg:focus-visible .cycling-hint { opacity: 1; visibility: visible; }
 @media (max-width: 600px) { .footer-inner > span:first-child { flex-basis: 100%; } .footer-inner > span:nth-child(2) { margin-right: auto; } }
