@@ -13,13 +13,14 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Source+Serif+4:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/css/style.css?v=20260920-cycling-motion">
+  <link rel="stylesheet" href="/css/style.css?v=20261010-r5">
 </head>
 <body>
+  <a class="skip-link" href="#top">Skip to content</a>
   <header class="site-header"><nav class="nav container" aria-label="Primary navigation"><a class="brand" href="#top"><span class="brand-mark">HZ</span> Hailiang Zhao</a><div class="nav-links">
 <a href="#news">News</a><a href="#research">Research</a><a href="#contributions">Contributions</a><a href="#publications">Publications</a><a href="#join">Join</a><a class="lang-link" href="./index_zh.html" lang="zh-CN">&#20013;&#25991;</a><a class="nav-cv" href="./materials/cv_en.pdf" target="_blank" rel="noopener">CV (PDF) &#8599;</a>
 </div></nav></header>
-  <main id="top">
+  <main id="top" tabindex="-1">
     <section class="hero"><div class="container hero-grid">
 <div>
 <div class="eyebrow">School of Software Technology &middot; Zhejiang University</div>
@@ -31,11 +32,8 @@
 <a class="button button-primary" href="#join">Open positions</a><a class="button button-secondary" href="https://scholar.google.com/citations?hl=en&amp;user=wMj2rFsAAAAJ" target="_blank" rel="noopener">Google Scholar &#8599;</a>
 </div>
 </div>
-<aside class="academic-profile"><div class="section-kicker">Academic profile</div>
-<h2 class="profile-title">Intelligent computing systems</h2>
+<aside class="academic-profile"><h2 class="profile-title">Background</h2>
 <ul class="profile-list">
-<li>
-<strong>Position</strong>ZJU 100 Young Professor, School of Software Technology</li>
 <li>
 <strong>Education</strong>Ph.D., College of Computer Science and Technology, Zhejiang University, 2024</li>
 <li>
@@ -46,35 +44,33 @@
 </ul></aside>
 </div></section>
 
-    <section id="news" class="section section-alt"><div class="container">
+    <section id="news" class="section"><div class="container">
 <div class="section-head">
-<div class="section-kicker">Recent news</div>
-<h2>Updates</h2>
+<h2>Recent news</h2>
 </div>
 <ul class="timeline">
 <li>
-<time datetime="2026-09">Sep. 2026</time><p><strong>Learning-Augmented Algorithms: Guarantees, Construction Mechanisms, and System-Level Implications</strong> is released on arXiv.</p>
+<time datetime="2026-10">Oct. 2026</time><p><a href="https://doi.org/10.1145/3832783.3834338" target="_blank" rel="noopener">ARMOR</a> is published in the ASE 2026 proceedings.</p>
 </li>
 <li>
-<time datetime="2026-08">Aug. 2026</time><p><strong>ARMOR</strong>, a robust self-supervised framework for microservice root-cause analysis under missing observability modalities, is accepted at ASE &rsquo;26.</p>
+<time datetime="2026-09">Sep. 2026</time><p>Our survey <a href="https://arxiv.org/abs/2609.04787" target="_blank" rel="noopener">Learning-Augmented Algorithms</a> is available on arXiv.</p>
 </li>
 <li>
-<time datetime="2026-07">Jul. 2026</time><p><strong>Agentic Services Computing</strong> presents a service-computing perspective on systems centered on autonomous agents.</p>
+<time datetime="2026-07">Jul. 2026</time><p><a href="https://proceedings.mlr.press/v306/chen26gt.html" target="_blank" rel="noopener">Towards Optimal Robustness in Learning-Augmented Paging</a> is published at ICML 2026 as a Spotlight paper.</p>
 </li>
 <li>
-<time datetime="2026-04">Apr. 2026</time><p><strong>Towards Optimal Robustness in Learning-Augmented Paging</strong> receives an ICML &rsquo;26 Spotlight.</p>
+<time datetime="2026-07">Jul. 2026</time><p><a href="https://arxiv.org/abs/2509.24380" target="_blank" rel="noopener">Agentic Services Computing</a> is updated on arXiv.</p>
+</li>
+<li>
+<time datetime="2026-06">Jun. 2026</time><p><a href="https://openaccess.thecvf.com/content/CVPR2026/html/Zhang_SegQuant_A_Semantics-Aware_and_Generalizable_Quantization_Framework_for_Diffusion_Models_CVPR_2026_paper.html" target="_blank" rel="noopener">SegQuant</a> is published at CVPR 2026.</p>
 </li>
 </ul>
 </div></section>
 
     <section id="research" class="section"><div class="container">
 <div class="section-head">
-<div class="section-kicker">Research</div>
-<h2>Algorithms and systems for intelligent services.</h2>
+<h2>Research interests</h2>
 <p>I work across online optimization, systems, and machine learning for the deployment, coordination, and operation of intelligent services.</p>
-<div class="pill-row">
-<span class="pill">Learning-augmented systems</span><span class="pill">Agentic services</span><span class="pill">Generative AI systems</span><span class="pill">Cloud-edge intelligence</span>
-</div>
 </div>
 <div class="research-grid">
 <article class="card research-card"><div class="research-no">01 &middot; GENERATIVE AI SYSTEMS</div>
@@ -87,10 +83,9 @@
 </div>
 </div></section>
 
-    <section id="contributions" class="section section-alt"><div class="container">
+    <section id="contributions" class="section"><div class="container">
 <div class="section-head">
-<div class="section-kicker">Selected research contributions</div>
-<h2>Online optimization, generative AI, and agentic services.</h2>
+<h2>Selected research contributions</h2>
 </div>
 <div class="work-grid">
 <article class="card work-card"><div>
@@ -99,84 +94,61 @@
 <p>Our survey organizes guarantees, construction mechanisms, and system-level implications. PFSUM, Guard, and RPB develop learning-augmented algorithms for online rent-or-buy, caching, and paging.</p>
 </div>
 <div class="work-links">
-<a href="https://arxiv.org/abs/2609.04787" target="_blank" rel="noopener">Survey &#8599;</a><a href="https://proceedings.neurips.cc/paper_files/paper/2024/hash/cd96cb9a239c37b39dbf34f3f5a4c56f-Abstract-Conference.html" target="_blank" rel="noopener">PFSUM &#8599;</a><a href="https://neurips.cc/virtual/2025/loc/san-diego/poster/116615" target="_blank" rel="noopener">Guard &#8599;</a><a href="https://arxiv.org/pdf/2606.01342" target="_blank" rel="noopener">RPB &#8599;</a><a class="interpretation-link" href="./works/laa.html">Read</a>
+<a href="https://arxiv.org/abs/2609.04787" target="_blank" rel="noopener">Survey &#8599;</a><a href="https://proceedings.neurips.cc/paper_files/paper/2024/hash/cd96cb9a239c37b39dbf34f3f5a4c56f-Abstract-Conference.html" target="_blank" rel="noopener">PFSUM &#8599;</a><a href="https://proceedings.neurips.cc/paper_files/paper/2025/hash/b1e7f61f40d68b2177857bfcb195a507-Abstract-Conference.html" target="_blank" rel="noopener">Guard &#8599;</a><a href="https://proceedings.mlr.press/v306/chen26gt.html" target="_blank" rel="noopener">RPB &#8599;</a><a class="interpretation-link" href="./works/laa.html">Read</a>
 </div></article><article class="card work-card"><div>
 <div class="work-tag">CVPR &rsquo;26 &middot; arXiv</div>
 <h3>Structure-aware efficiency for diffusion models</h3>
 <p>SegQuant studies semantic-aware quantization. Shiva-DiT develops differentiable selection for efficient diffusion transformers.</p>
 </div>
 <div class="work-links">
-<a href="https://arxiv.org/abs/2507.14811" target="_blank" rel="noopener">SegQuant &#8599;</a><a href="https://arxiv.org/abs/2602.05605" target="_blank" rel="noopener">Shiva-DiT &#8599;</a><a class="interpretation-link" href="./works/segquant.html">Read</a>
+<a href="https://openaccess.thecvf.com/content/CVPR2026/html/Zhang_SegQuant_A_Semantics-Aware_and_Generalizable_Quantization_Framework_for_Diffusion_Models_CVPR_2026_paper.html" target="_blank" rel="noopener">SegQuant &#8599;</a><a href="https://arxiv.org/abs/2602.05605" target="_blank" rel="noopener">Shiva-DiT &#8599;</a><a class="interpretation-link" href="./works/segquant.html">Read</a>
 </div></article><article class="card work-card"><div>
 <div class="work-tag">Agentic Services &middot; ASE &rsquo;26</div>
 <h3>Agentic service computing and incident management</h3>
 <p>We study agent-centered service platforms and system support for microservice incident management. Recent work includes Agentic Services Computing and <strong>Armor</strong>.</p>
 </div>
 <div class="work-links">
-<a href="https://arxiv.org/abs/2509.24380" target="_blank" rel="noopener">Agentic Services Computing &#8599;</a><a href="https://arxiv.org/abs/2603.25538" target="_blank" rel="noopener">Armor &#8599;</a><a class="interpretation-link" href="./works/armor.html">Read</a>
+<a href="https://arxiv.org/abs/2509.24380" target="_blank" rel="noopener">Agentic Services Computing &#8599;</a><a href="https://doi.org/10.1145/3832783.3834338" target="_blank" rel="noopener">Armor &#8599;</a><a class="interpretation-link" href="./works/armor.html">Read</a>
 </div></article>
-</div>
-</div></section>
-
-    <section id="join" class="section section-alt"><div class="container">
-<div class="section-head">
-<div class="section-kicker">Join the group</div>
-<h2>Students, postdoctoral researchers, and faculty.</h2>
-<p>Recruitment for the 2027 PhD cohort has concluded, and one student has been confirmed.</p>
-</div>
-<div class="join-grid">
-<article class="join-card"><div class="section-kicker">Faculty &amp; postdoctoral positions</div>
-<h2>Faculty and postdoctoral positions</h2>
-<p>Applicants working on AI systems, systems optimization, or related areas are welcome.</p>
-<a class="button button-secondary" href="mailto:hliangzhao@zju.edu.cn?subject=Faculty%20or%20Postdoctoral%20Inquiry">Contact me</a></article><article class="join-card join-card-accent"><div class="section-kicker">PhD &amp; master&rsquo;s students</div>
-<h2>2027 PhD recruitment closed</h2>
-<p>Research interests include agentic services, generative AI systems, cloud-edge intelligence, and optimization.</p>
-<a class="button button-secondary" href="mailto:hliangzhao@zju.edu.cn?subject=Prospective%20Master%27s%20Student%20Inquiry">Master&rsquo;s inquiries</a></article>
 </div>
 </div></section>
 
     <section id="publications" class="section"><div class="container">
 <div class="section-head">
-<div class="section-kicker">Publications</div>
 <h2>Selected papers</h2>
 <p>&ldquo;&dagger;&rdquo; denotes equal contribution; &ldquo;*&rdquo; denotes corresponding author. For the complete and most up-to-date record, see <a href="https://scholar.google.com/citations?hl=en&amp;user=wMj2rFsAAAAJ" target="_blank" rel="noopener">Google Scholar &#8599;</a>.</p>
 </div>
 <ol class="publication-list">
 <li>
-<div class="venue">ASE &rsquo;26 &middot; Accepted</div>
-<p class="paper-title"><a href="https://arxiv.org/abs/2603.25538" target="_blank" rel="noopener">ARMOR: A Robust Self-Supervised Framework for Root Cause Analysis in Microservices under Missing Modality</a></p>
-<p>Wenzhuo Qian, <strong>Hailiang Zhao*</strong>, Ziqi Wang, Zhipeng Gao, Jiayi Chen, Zhiwei Ling, and Shuiguang Deng*. <a class="paper-note" href="./works/armor.html">Research note</a></p>
+<div class="venue">ASE &rsquo;26</div>
+<p class="paper-title"><a href="https://doi.org/10.1145/3832783.3834338" target="_blank" rel="noopener">ARMOR: A Robust Self-Supervised Framework for Root Cause Analysis in Microservices under Missing Modality</a></p>
+<p>Wenzhuo Qian, <strong>Hailiang Zhao*</strong>, Ziqi Wang, Zhipeng Gao, Jiayi Chen, Zhiwei Ling, and Shuiguang Deng*. <a href="https://arxiv.org/abs/2603.25538" target="_blank" rel="noopener">Author version &#8599;</a> <a class="paper-note" href="./works/armor.html">Research note</a></p>
 </li>
 <li>
 <div class="venue">ICML &rsquo;26 &middot; <span class="award">Spotlight</span>
 </div>
-<p class="paper-title"><a href="https://arxiv.org/pdf/2606.01342" target="_blank" rel="noopener">Towards Optimal Robustness in Learning-Augmented Paging</a></p>
+<p class="paper-title"><a href="https://proceedings.mlr.press/v306/chen26gt.html" target="_blank" rel="noopener">Towards Optimal Robustness in Learning-Augmented Paging</a></p>
 <p>Peng Chen, <strong>Hailiang Zhao*</strong>, Xueyan Tang, Yixuan Wang, and Shuiguang Deng*. <a class="paper-note" href="./works/rpb.html">Research note</a></p>
 </li>
 <li>
 <div class="venue">CVPR &rsquo;26</div>
-<p class="paper-title"><a href="https://arxiv.org/abs/2507.14811" target="_blank" rel="noopener">SegQuant: A Semantics-Aware and Generalizable Quantization Framework for Diffusion Models</a></p>
+<p class="paper-title"><a href="https://openaccess.thecvf.com/content/CVPR2026/html/Zhang_SegQuant_A_Semantics-Aware_and_Generalizable_Quantization_Framework_for_Diffusion_Models_CVPR_2026_paper.html" target="_blank" rel="noopener">SegQuant: A Semantics-Aware and Generalizable Quantization Framework for Diffusion Models</a></p>
 <p>Jiaji Zhang, Ruichao Sun, <strong>Hailiang Zhao*</strong>, Jiaju Wu, Peng Chen, Hao Li, Yuying Liu, Kingsum Chow, Gang Xiong, and Shuiguang Deng*. <a href="https://optisys-zju.github.io/segquant/" target="_blank" rel="noopener">Project &#8599;</a><a class="paper-note" href="./works/segquant.html">Research note</a></p>
 </li>
 <li>
-<div class="venue">IEEE TSC &middot; 2025</div>
-<p class="paper-title"><a href="https://www.computer.org/csdl/journal/sc/5555/01/11315880/2cLcnmTE4UM" target="_blank" rel="noopener">PeerSync: Accelerating Containerized Model Inference at the Network Edge</a></p>
+<div class="venue">IEEE TSC &middot; 2026</div>
+<p class="paper-title"><a href="https://doi.org/10.1109/TSC.2025.3648591" target="_blank" rel="noopener">PeerSync: Accelerating Containerized Model Inference at the Network Edge</a></p>
 <p>Yinuo Deng&dagger;, <strong>Hailiang Zhao&dagger;*</strong>, Dongjing Wang, Peng Chen, Wenzhuo Qian, Jianwei Yin, Schahram Dustdar, and Shuiguang Deng*.</p>
 </li>
 <li>
 <div class="venue">NeurIPS &rsquo;25</div>
-<p class="paper-title"><a href="https://neurips.cc/virtual/2025/loc/san-diego/poster/116615" target="_blank" rel="noopener">Robustifying Learning-Augmented Caching Efficiently without Compromising 1-Consistency</a></p>
+<p class="paper-title"><a href="https://proceedings.neurips.cc/paper_files/paper/2025/hash/b1e7f61f40d68b2177857bfcb195a507-Abstract-Conference.html" target="_blank" rel="noopener">Robustifying Learning-Augmented Caching Efficiently without Compromising 1-Consistency</a></p>
 <p>Peng Chen, <strong>Hailiang Zhao*</strong>, Jiaji Zhang, Xueyan Tang, Yixuan Wang, and Shuiguang Deng*. <a href="./materials/guard-poster.png" target="_blank" rel="noopener">Poster &#8599;</a></p>
 </li>
 <li>
 <div class="venue">CVPR &rsquo;25</div>
 <p class="paper-title"><a href="https://openaccess.thecvf.com/content/CVPR2025/papers/Ling_CADRef_Robust_Out-of-Distribution_Detection_via_Class-Aware_Decoupled_Relative_Feature_Leveraging_CVPR_2025_paper.pdf" target="_blank" rel="noopener">CADRef: Robust Out-of-Distribution Detection via Class-Aware Decoupled Relative Feature Leveraging</a></p>
 <p>Zhiwei Ling, Yachen Chang, <strong>Hailiang Zhao*</strong>, Xinkui Zhao, Kingsum Chow*, and Shuiguang Deng. <a href="https://github.com/LingAndZero/CADRef" target="_blank" rel="noopener">Code &#8599;</a></p>
-</li>
-<li>
-<div class="venue">NeurIPS &rsquo;24</div>
-<p class="paper-title"><a href="https://proceedings.neurips.cc/paper_files/paper/2024/hash/cd96cb9a239c37b39dbf34f3f5a4c56f-Abstract-Conference.html" target="_blank" rel="noopener">Learning-Augmented Algorithms for the Bahncard Problem</a></p>
-<p><strong>Hailiang Zhao</strong>, Xueyan Tang*, Peng Chen, and Shuiguang Deng. <a href="https://github.com/Natureal/PFSUM" target="_blank" rel="noopener">Code &#8599;</a> &middot; <a href="./materials/pfsum.pdf" target="_blank" rel="noopener">Slides &#8599;</a></p>
 </li>
 <li>
 <div class="venue">IEEE TSC &middot; 2025</div>
@@ -194,18 +166,23 @@
 <p>Cheng Zhang, Yinuo Deng, <strong>Hailiang Zhao*</strong>, Tianlv Chen, and Shuiguang Deng*.</p>
 </li>
 <li>
+<div class="venue">NeurIPS &rsquo;24</div>
+<p class="paper-title"><a href="https://proceedings.neurips.cc/paper_files/paper/2024/hash/cd96cb9a239c37b39dbf34f3f5a4c56f-Abstract-Conference.html" target="_blank" rel="noopener">Learning-Augmented Algorithms for the Bahncard Problem</a></p>
+<p><strong>Hailiang Zhao</strong>, Xueyan Tang*, Peng Chen, and Shuiguang Deng. <a href="https://github.com/Natureal/PFSUM" target="_blank" rel="noopener">Code &#8599;</a> &middot; <a href="./materials/pfsum.pdf" target="_blank" rel="noopener">Slides &#8599;</a></p>
+</li>
+<li>
 <div class="venue">Proceedings of the IEEE &middot; 2024</div>
 <p class="paper-title"><a href="https://ieeexplore.ieee.org/document/10433234" target="_blank" rel="noopener">Cloud-Native Computing: A Survey From the Perspective of Services</a></p>
-<p>Shuiguang Deng*, <strong>Hailiang Zhao*</strong>, Bingbing Huang, Cheng Zhang, Feiyi Chen, Yinuo Deng, Jianwei Yin, Schahram Dustdar, and Albert Y. Zomaya. <span class="award">Cover Paper</span></p>
+<p>Shuiguang Deng*, <strong>Hailiang Zhao*</strong>, Binbin Huang, Cheng Zhang, Feiyi Chen, Yinuo Deng, Jianwei Yin, Schahram Dustdar, and Albert Y. Zomaya. <span class="award">Cover Paper</span></p>
 </li>
 <li>
 <div class="venue">IEEE TSC &middot; 2024</div>
-<p class="paper-title"><a href="https://ieeexplore.ieee.org/abstract/document/10213224" target="_blank" rel="noopener">Scheduling Multi-Server Jobs with Sublinear Regrets via Online Learning</a></p>
+<p class="paper-title"><a href="https://ieeexplore.ieee.org/abstract/document/10213224" target="_blank" rel="noopener">Scheduling Multi-Server Jobs With Sublinear Regrets via Online Learning</a></p>
 <p><strong>Hailiang Zhao</strong>, Shuiguang Deng*, Zhengzhe Xiang, Xueqiang Yan, Jianwei Yin, Schahram Dustdar, and Albert Y. Zomaya.</p>
 </li>
 <li>
 <div class="venue">IEEE TPDS &middot; 2023</div>
-<p class="paper-title"><a href="https://ieeexplore.ieee.org/document/9925644" target="_blank" rel="noopener">Learning to Schedule Multi-Server Jobs with Fluctuated Processing Speeds</a></p>
+<p class="paper-title"><a href="https://ieeexplore.ieee.org/document/9925644" target="_blank" rel="noopener">Learning to Schedule Multi-Server Jobs With Fluctuated Processing Speeds</a></p>
 <p><strong>Hailiang Zhao</strong>, Shuiguang Deng*, Feiyi Chen, Jianwei Yin, Schahram Dustdar, and Albert Y. Zomaya.</p>
 </li>
 <li>
@@ -230,11 +207,11 @@
 </li>
 <li>
 <div class="venue">IEEE ICWS &middot; 2019</div>
-<p class="paper-title"><a href="https://ieeexplore.ieee.org/document/8818403" target="_blank" rel="noopener">A Mobility-aware Cross-edge Computation Offloading Framework for Partitionable Applications</a></p>
+<p class="paper-title"><a href="https://ieeexplore.ieee.org/document/8818403" target="_blank" rel="noopener">A Mobility-Aware Cross-Edge Computation Offloading Framework for Partitionable Applications</a></p>
 <p><strong>Hailiang Zhao</strong>, Shuiguang Deng*, Cheng Zhang, Wei Du, Qiang He, and Jianwei Yin. <span class="award">Best Student Paper</span></p>
 </li>
 </ol>
-      <details><summary>Show additional selected publications and preprints</summary><div class="details-inner"><ol class="publication-list">
+      <details><summary>Preprints</summary><div class="details-inner"><ol class="publication-list">
 <li>
 <p class="paper-title"><a href="https://arxiv.org/abs/2609.04787" target="_blank" rel="noopener">Learning-Augmented Algorithms: Guarantees, Construction Mechanisms, and System-Level Implications</a></p>
 <p><strong>Hailiang Zhao</strong>, Xueyan Tang, Peng Chen, Zenong Ye, Tianjun Zhu, Jianwei Yin, and Shuiguang Deng. arXiv preprint. <a class="paper-note" href="./works/laa.html">Research note</a></p>
@@ -286,9 +263,22 @@
 </ol></div></details>
 </div></section>
 
-    <section class="section section-alt"><div class="container split-grid">
+    <section id="join" class="section"><div class="container">
+<div class="section-head">
+<h2>Join the group</h2>
+<p>Recruitment for the 2027 PhD cohort has concluded, and one student has been confirmed.</p>
+</div>
+<div class="join-grid">
+<article class="join-card"><h3>Faculty and postdoctoral positions</h3>
+<p>Applicants working on AI systems, systems optimization, or related areas are welcome.</p>
+<a class="button button-secondary" href="mailto:hliangzhao@zju.edu.cn?subject=Faculty%20or%20Postdoctoral%20Inquiry">Contact me</a></article><article class="join-card"><h3>2027 PhD recruitment closed</h3>
+<p>Research interests include agentic services, generative AI systems, cloud-edge intelligence, and optimization.</p>
+<a class="button button-secondary" href="mailto:hliangzhao@zju.edu.cn?subject=Prospective%20Master%27s%20Student%20Inquiry">Master&rsquo;s inquiries</a></article>
+</div>
+</div></section>
+
+    <section class="section"><div class="container portfolio-grid">
 <div>
-<div class="section-kicker">Research portfolio</div>
 <h2>Selected projects</h2>
 <div class="project-grid">
 <div class="project">
@@ -312,7 +302,6 @@
 </div>
 </div>
 <div>
-<div class="section-kicker">Recognition &amp; service</div>
 <h2>Awards and academic service</h2>
 <ul class="compact-list">
 <li>Ningbo Yongjiang Talent (2026)</li>
@@ -330,13 +319,12 @@
 <li>Zhejiang University Boxin Scholarship (2019)</li>
 <li>Wuhan University of Technology Outstanding Scholarship (2018)</li>
 </ul></div></details><h3 style="margin-top:28px">Professional service</h3>
-<p>Young Editorial Board Member, <em>Computer Engineering &amp; Science</em>; PC member and reviewer for NeurIPS, IJCAI-ECAI, AAAI, PAKDD, and related venues; reviewer for TSC, TMC, FGCS, TKDD, IoTJ, and others.</p>
+<p class="service-summary">Young Editorial Board Member, <em>Computer Engineering &amp; Science</em>; PC member and reviewer for NeurIPS, IJCAI-ECAI, AAAI, PAKDD, and related venues; reviewer for TSC, TMC, FGCS, TKDD, IoTJ, and others.</p>
 </div>
 </div></section>
 
     <section class="section"><div class="container split-grid">
 <div>
-<div class="section-kicker">Resources</div>
 <h2>Teaching and research materials</h2>
 <p>Selected lecture notes, explanatory slides, and systems analyses.</p>
 <details><summary>Browse research materials</summary><div class="details-inner"><ul class="compact-list">
@@ -361,8 +349,7 @@
 <li><a href="./materials/Lyapunov_optimization.pdf" target="_blank" rel="noopener">An Introduction to Lyapunov Optimization</a> (2020)</li>
 </ul></div></details>
 </div>
-<aside class="contact-card"><div class="section-kicker">Contact</div>
-<p>Student inquiries, research collaboration, and invited talks:</p>
+<aside class="contact-card"><h2>Contact</h2>
 <p><a href="mailto:hliangzhao@zju.edu.cn"><strong>hliangzhao@zju.edu.cn</strong></a><br><a href="mailto:hliangzhao97@gmail.com">hliangzhao97@gmail.com</a></p>
 <p>Ningbo Campus: Room 3#403<br>Yuquan Campus: Room 422, Cao Guangbiao Sci-tech Building</p></aside>
 </div></section>

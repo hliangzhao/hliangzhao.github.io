@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700&amp;family=Source+Serif+4:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/css/style.css?v=20260830">
+  <link rel="stylesheet" href="/css/style.css?v=20261010-r5">
   <script src="/js/mathjax-config.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 </head>
@@ -43,7 +43,7 @@
       <div class="article-note"><strong>这篇综述关注的核心问题：</strong>预测究竟在算法构造的哪个位置发挥作用？相关结论是已取得的上界、上下界匹配的极限，还是经验性的系统证据？</div>
 
       <h2>2. 基本契约：好预测应当有用，坏预测不能让代价失控</h2>
-      <p>设 (I) 为问题实例，(hat y) 为预测结果，(y^*(I)) 为尚未知晓的真实目标，(eta(I,hat y)) 为任务相关的预测误差。学习增强算法 (A) 与离线最优解 (operatorname{OPT}(I)) 比较。综述用 (lambdain[0,1]) 表示事先选定的信任参数，(lambda) 越小，算法越信任预测。</p>
+      <p>设 \(I\) 为问题实例，\(\hat y\) 为预测结果，\(y^*(I)\) 为尚未知晓的真实目标，\(\eta(I,\hat y)\) 为任务相关的预测误差。学习增强算法 \(A\) 与离线最优解 \(\operatorname{OPT}(I)\) 比较。综述用 \(\lambda\in[0,1]\) 表示事先选定的信任参数，\(\lambda\) 越小，算法越信任预测。</p>
       <div class="math-block"><div class="math-caption">三类不同的性能承诺</div>
         \[
           \text{一致性：}\quad
@@ -66,7 +66,7 @@
       <p>这三项性质有关联，却不能彼此替代。一个随误差无限增长的平滑性上界，并没有给出与预测无关的鲁棒性；一致性只说明误差恰好为零时的表现，不能自动说明小误差下是否稳定；只有同一形式化模型中的下界排除了所有更优组合，一致性与鲁棒性的折中曲线才能称为紧致。</p>
 
       <h3>滑雪租赁问题把折中关系讲得最清楚</h3>
-      <p>假设每天租雪具的成本为 1，直接购买的成本为 (B)，预测器给出滑雪天数。参数化算法在 (lambda) 较小时更相信预测。一类经典规则具有如下保证：</p>
+      <p>假设每天租雪具的成本为 1，直接购买的成本为 \(B\)，预测器给出滑雪天数。参数化算法在 \(\lambda\) 较小时更相信预测。一类经典规则具有如下保证：</p>
       <div class="math-block">
         \[
           \operatorname{CR}
@@ -76,7 +76,7 @@
             1+\lambda+\frac{\eta_{\mathrm{abs}}}{(1-\lambda)\operatorname{OPT}}
           \right\}.
         \]
-        <p>预测完全准确时，第二项给出 (1+lambda) 的一致性；无论预测错得多严重，第一项都把竞争比限制在 (1+1/lambda) 以内。更信任预测可以改善一致性，但会放宽最坏情况上界。</p>
+        <p>预测完全准确时，第二项给出 \(1+\lambda\) 的一致性；无论预测错得多严重，第一项都把竞争比限制在 \(1+1/\lambda\) 以内。更信任预测可以改善一致性，但会放宽最坏情况上界。</p>
       </div>
 
       <h2>3. 选算法之前，先说明究竟预测什么</h2>
@@ -148,7 +148,7 @@
       </figure>
 
       <h3>把预测成本计入目标后，原有结论会改变</h3>
-      <p>如果一次预测调用在系统目标中折算为成本 (c)，算法共调用 (Q_A) 次，综述提出如下记账量：</p>
+      <p>如果一次预测调用在系统目标中折算为成本 \(c\)，算法共调用 \(Q_A\) 次，综述提出如下记账量：</p>
       <div class="math-block">
         \[
           \operatorname{cost}_{c}(A)
@@ -180,7 +180,7 @@
       <h2>9. 接下来值得研究什么</h2>
       <p>综述最后提出四组相互关联的问题：如何在优化目标中给预测定价，如何建立更一般的组合演算，如何处理由策略引起的误差以及对抗性和策略性误差，如何让实验基准真正可比较。贯穿全文的方法论是，预测应被视为一种类型明确、可能出错并且具有成本的算法输入，而不是笼统的“智能”。任何保证都属于预测、决策、状态、目标与比较基准构成的完整契约。</p>
 
-      <section class="article-related"><h2>相关研究脉络</h2><div class="article-related-links"><a href="https://proceedings.neurips.cc/paper_files/paper/2024/hash/cd96cb9a239c37b39dbf34f3f5a4c56f-Abstract-Conference.html" target="_blank" rel="noopener">PFSUM：学习增强 Bahncard problem &#8599;</a><a href="https://neurips.cc/virtual/2025/loc/san-diego/poster/116615" target="_blank" rel="noopener">Guard：鲁棒学习增强缓存算法 &#8599;</a><a href="/works/rpb_zh.html">RPB：逼近最优鲁棒性的分页算法</a></div></section>
+      <section class="article-related"><h2>相关研究脉络</h2><div class="article-related-links"><a href="https://proceedings.neurips.cc/paper_files/paper/2024/hash/cd96cb9a239c37b39dbf34f3f5a4c56f-Abstract-Conference.html" target="_blank" rel="noopener">PFSUM：学习增强 Bahncard problem &#8599;</a><a href="https://proceedings.neurips.cc/paper_files/paper/2025/hash/b1e7f61f40d68b2177857bfcb195a507-Abstract-Conference.html" target="_blank" rel="noopener">Guard：鲁棒学习增强缓存算法 &#8599;</a><a href="/works/rpb_zh.html">RPB：逼近最优鲁棒性的分页算法</a></div></section>
     </article>
   </main>
 
