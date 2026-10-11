@@ -90,7 +90,7 @@ h3 { margin-bottom: .5rem; font-size: 1.05rem; }
 .research-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .work-grid { grid-template-columns: 1fr; gap: 0; counter-reset: work; }
 .join-grid { grid-template-columns: repeat(2, 1fr); }
-.split-grid { grid-template-columns: minmax(0, 1.25fr) minmax(260px, .75fr); gap: 32px; }
+.split-grid { grid-template-columns: minmax(0, 1.25fr) minmax(260px, .75fr); align-items: start; gap: 32px; }
 .card { min-width: 0; }
 .research-card + .research-card { padding-left: 22px; border-left: 1px solid var(--line); }
 .research-no { margin-bottom: 8px; color: var(--accent); font-size: .68rem; font-weight: 500; letter-spacing: .02em; }
@@ -147,10 +147,11 @@ details .details-inner { padding: 16px 0 7px; }
 .compact-list { margin: 0; padding-left: 19px; }
 .compact-list li { margin: 0 0 8px; break-inside: avoid; font-size: .91rem; }
 .compact-list li::marker { color: #a6a5a0; }
-.service-summary { color: var(--muted); font-size: .91rem; line-height: 1.65; }
+.service-summary, .materials-summary { margin-bottom: 0; color: var(--muted); font-size: .91rem; line-height: 1.65; }
+.materials-summary + details { margin-top: 12px; }
 .contact-card { padding: 0 0 0 24px; border-left: 1px solid var(--line); }
-.contact-card h2 { font-size: 1.25rem; }
 .contact-card p { color: var(--muted); font-size: .88rem; }
+.contact-card p:last-child { margin-bottom: 0; }
 .site-footer { padding: 21px 0; color: var(--muted); border-top: 1px solid var(--line); font-size: .75rem; }
 .site-footer a { color: var(--muted); }
 .footer-inner { display: flex; flex-wrap: wrap; align-items: center; gap: 15px; }
