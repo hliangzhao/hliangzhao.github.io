@@ -16,7 +16,7 @@ body {
   margin: 0;
   background: var(--paper);
   color: var(--ink);
-  font-family: "Noto Serif SC", "Songti SC", STSong, serif;
+  font-family: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif;
   font-size: 17px;
   line-height: 1.6;
 }
@@ -192,6 +192,7 @@ details .details-inner { padding: 16px 0 7px; }
 .article-actions { display: flex; flex-wrap: wrap; gap: 9px; }
 .article-main { padding: 38px 0 64px; }
 .article-lead { margin-bottom: 30px; color: #34485c; font-family: "Source Serif 4", "Noto Serif SC", Georgia, serif; font-size: 1.08rem; line-height: 1.7; }
+html[lang="zh-CN"] .article-deck, html[lang="zh-CN"] .article-lead { font-family: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif; }
 .article-summary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 0 0 40px; }
 .article-summary article { padding: 15px; background: var(--navy-soft); border-top: 2px solid var(--accent); }
 .article-summary strong { display: block; margin-bottom: 5px; color: var(--navy); font-family: "Source Serif 4", "Noto Serif SC", Georgia, serif; font-size: 1rem; }
