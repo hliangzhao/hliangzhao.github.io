@@ -150,6 +150,7 @@ details .details-inner { padding: 16px 0 7px; }
 .project-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px 36px; }
 .project { padding: 0; color: var(--muted); font-size: .88rem; }
 .project strong { display: block; margin-bottom: 5px; color: var(--ink); font-size: .96rem; font-weight: 600; }
+.project-note { margin: 18px 0 0; padding-top: 14px; border-top: 1px solid var(--line); color: var(--muted); font-size: .88rem; }
 .compact-list { margin: 0; padding-left: 19px; }
 .compact-list li { margin: 0 0 8px; break-inside: avoid; font-size: .91rem; }
 .compact-list li::marker { color: #a6a5a0; }
