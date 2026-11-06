@@ -1,3 +1,12 @@
+@font-face {
+  font-family: "Ma Shan Zheng Name";
+  src: url("../assets/fonts/ma-shan-zheng-name.woff2") format("woff2");
+  font-display: swap;
+  font-style: normal;
+  font-weight: 400;
+  unicode-range: U+4EAE, U+6D77, U+8D75;
+}
+
 :root {
   --ink: #26313b;
   --muted: #626d77;
@@ -59,6 +68,7 @@ h3 { margin-bottom: .5rem; font-size: 1.05rem; }
 .eyebrow, .section-kicker { color: var(--accent); font-size: .72rem; font-weight: 800; letter-spacing: .105em; text-transform: uppercase; }
 .hero .eyebrow { color: var(--muted); font-size: .68rem; font-weight: 500; letter-spacing: .07em; }
 .hero h1 { margin: 12px 0 17px; font-size: clamp(2.1rem, 4.3vw, 2.8rem); letter-spacing: -.035em; }
+html[lang="zh-CN"] .hero h1 { font-family: "Ma Shan Zheng Name", "Noto Serif SC", serif; font-size: clamp(2.35rem, 4.7vw, 3.05rem); font-weight: 400; line-height: 1.18; letter-spacing: .055em; }
 .hero-title { margin-bottom: 18px; color: var(--accent); font-size: 1rem; }
 .hero-lede { max-width: 620px; font-size: 1.05rem; line-height: 1.7; }
 .hero-meta { margin: 15px 0 18px; color: var(--muted); font-size: .86rem; }
